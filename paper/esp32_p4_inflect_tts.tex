@@ -1044,10 +1044,24 @@ alone.
 
 \section{Reproducibility}
 
-The repository retains source changes, exporters, test scripts, firmware,
-model packages, board logs, JSON summaries, and listening WAVs. The experiment
-report records hypotheses, raw results, failures, and decisions in chronological
-order. Each logically complete change is a separate Git commit.
+The public publication snapshot is available at:
+\begin{center}
+\small\url{https://github.com/inlanger/esp32-p4-inflect-tts}
+\end{center}
+The immutable snapshot used by this paper is commit
+\nolinkurl{336e7670a4e6a540d8841df35f8d9b3da3fae23f}. Its exact URL is:
+\begin{center}
+\small\url{https://github.com/inlanger/esp32-p4-inflect-tts/commit/336e7670a4e6a540d8841df35f8d9b3da3fae23f}
+\end{center}
+It contains the manuscript source, rendered PDF, metadata, and arXiv upload
+archive. Firmware, runtime patches, model packages, and listening artifacts
+are still being consolidated while the separate decoder-training experiment
+continues; the public repository records this release boundary explicitly.
+
+The working experiment repository retains source changes, exporters, test
+scripts, firmware, model packages, board logs, JSON summaries, and listening
+WAVs. Its report records hypotheses, raw results, failures, and decisions in
+chronological order. Each logically complete change is a separate Git commit.
 
 The final main package is named \texttt{short64-flow48}. Its size is
 8,409,632 bytes, file SHA-256 is
