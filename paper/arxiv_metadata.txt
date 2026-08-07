@@ -1,0 +1,17 @@
+Title: Complete Raw-Text Neural Speech Synthesis on an ESP32-P4
+
+Authors: Volodymyr Sokolovskyi (Go Wombat)
+
+Abstract:
+This paper describes the deployment of a complete English text-to-waveform system on an ESP32-P4 microcontroller. The device accepts raw UTF-8 text and executes normalization, eSpeak-NG phonemization, model-specific tokenization, an acoustic model, duration and monotonic-path construction, latent sampling, inverse normalizing flow, neural waveform decoding, and PCM16 conversion. No host processor contributes phonemes, tokens, latent tensors, or waveform samples. The evaluated board contains an early-revision dual-core 360 MHz ESP32-P4, 32 MiB of in-package PSRAM, and 16 MiB of flash; it has no neural processing unit. The port uses the 3.96-million-parameter Inflect-Nano-v2 model and ESP-DL. The main deployment work comprised exact polyphase replacement of unsupported transposed convolutions, time-axis dual-core scheduling for Conv1D, layout specialization and graph passes, mixed INT8/INT16 quantization, resident model objects, static flow and decoder length buckets, and an on-device text segmentation planner. The first complete waveform decoder required 12.809 s for 1.525 s of audio. The final short-utterance route decodes a 44-frame request in 1.335 s and executes all learned stages in 1.656 s, producing 0.469 s of 24 kHz speech. The current system is useful for short device speech and bounded queued announcements. Its exact decoder remains slower than real time and does not expose native streaming state.
+
+Primary category: cs.SD (Sound)
+Cross-list: eess.AS (Audio and Speech Processing)
+
+Comments: Technical report, 4 figures and 5 tables. No journal reference or external DOI at initial submission.
+
+Suggested license for author review: CC BY 4.0. The author must choose the arXiv distribution license during submission.
+
+Submission files produced by build_arxiv_source.sh:
+main.tex
+references.bib

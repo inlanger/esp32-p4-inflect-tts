@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this work, cite the technical report and this repository."
+title: "Complete Raw-Text Neural Speech Synthesis on an ESP32-P4"
+type: article
+authors:
+  - family-names: Sokolovskyi
+    given-names: Volodymyr
+    email: vladimir.s@gowombat.team
+date-released: 2026-08-07
+repository-code: "https://github.com/inlanger/esp32-p4-inflect-tts"
+url: "https://github.com/inlanger/esp32-p4-inflect-tts"
+abstract: >-
+  A complete English text-to-waveform neural speech synthesizer deployed on an
+  ESP32-P4 microcontroller, including normalization, phonemization, acoustic
+  inference, inverse flow, waveform decoding, and PCM16 conversion.
