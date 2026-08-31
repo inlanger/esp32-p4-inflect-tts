@@ -1044,44 +1044,53 @@ alone.
 
 \section{Reproducibility}
 
-The public publication snapshot is available at:
+The public buildable source and evidence release is available at:
 \begin{center}
 \small\url{https://github.com/inlanger/esp32-p4-inflect-tts}
 \end{center}
-The immutable snapshot used by this paper is commit
+The original paper-only snapshot is commit
 \nolinkurl{336e7670a4e6a540d8841df35f8d9b3da3fae23f}. Its exact URL is:
 \begin{center}
 \small\url{https://github.com/inlanger/esp32-p4-inflect-tts/commit/336e7670a4e6a540d8841df35f8d9b3da3fae23f}
 \end{center}
-It contains the manuscript source, rendered PDF, metadata, and arXiv upload
-archive. Firmware, runtime patches, model packages, and listening artifacts
-are still being consolidated while the separate decoder-training experiment
-continues; the public repository records this release boundary explicitly.
+The exact no-retraining firmware and artifact release is commit
+\nolinkurl{f5701f9f92e92522086233d6c10879c07740b10f}. Supplemental sanitized
+decoder evidence was added in commit
+\nolinkurl{d73897194ae034cf8a13d87add01ca15f99799f8}.
 
-The working experiment repository retains source changes, exporters, test
-scripts, firmware, model packages, board logs, JSON summaries, and listening
-WAVs. Its report records hypotheses, raw results, failures, and decisions in
-chronological order. Each logically complete change is a separate Git commit.
+The deployable ESP-DL model package is distributed separately at:
+\begin{center}
+\small\url{https://huggingface.co/inlanger/inflect-nano-v2-esp32p4-espdl}
+\end{center}
+Its immutable Hub revision is
+\nolinkurl{282a7eaf953e8a9e972b86d844d1d2823a48df21}. The Hub repository contains
+only model packages, fixed assets, a retained WAV, the model card, manifest,
+and model-license notices. Firmware, the ESP-DL patch, raw JSON telemetry,
+build scripts, and supplemental analysis remain in the GitHub repository.
+Experimental retrained G5--G18 decoder lineages are excluded from both
+releases.
 
-The final main package is named \texttt{short64-flow48}. Its size is
+The final main package is named \texttt{short64-flow48}; it contains the
+acoustic graph, T64 and T96 waveform decoders, and the CSE Flow48 graph. Its size is
 8,409,632 bytes, file SHA-256 is
 \nolinkurl{3a267b2310a36ad5cc561e5ac3da78ee89aec66fb3b4c7df3abbd43280304bb9},
 and its internal package digest is
 \nolinkurl{b3ffb16b34e180a040796727385500adc6ad721d64c3b0082fdad25479c843cb}.
 The matching application SHA-256 is
 \nolinkurl{50462fa0add9f59b68ca9b8e7adc8525e4eb4427d839405694652a101b9d1634}.
-Flow48 alone has SHA-256
-\nolinkurl{a5688f144d41e8c966583d4df72e6f58991e4004fe6906c8d39939385ccf1a68}.
 
 The final short board artifact is stored with machine-readable telemetry. Its
 WAV SHA-256 is
 \nolinkurl{add6b5be3e21278a46837c5a0269cee9392bbf6dc6081327082797963fd381b8};
 the corresponding JSON SHA-256 is
 \nolinkurl{17e17cb633b26863ae7c990cae0e0529f4fcec9c5917ffdca7eaa8b21500ec31}.
-The reverse-engineering manifest records every decoder convolution shape,
-nominal MAC count, real activation statistics, parameter group, and receptive
-field result. Its SHA-256 is
-\nolinkurl{3572eb3b963bdc98c2460957457665f5f538bfb6cd715a5017b67651a12a9b17}.
+The public supplemental record at
+\nolinkurl{evidence/decoder-surface/decoder-surface.json} contains every
+decoder convolution shape, nominal MAC count, real activation statistics,
+parameter group, and receptive-field result. Only two workstation-local paths
+were removed from the retained research record; all numeric evidence and
+source hashes are unchanged. Its public SHA-256 is
+\nolinkurl{ad3fe556db6ea0ca54115ad7413ff1d7a88d7df18ef0f1c81e26419180c254bb}.
 
 Reproduction requires the early P4 revision or a deliberate retarget. The
 checked-in defaults select revision 1.x and 360 MHz; a binary built with these
@@ -1118,10 +1127,10 @@ measured runtime work, and evidence procedure.
 
 An arXiv systems report is justified by the complete deployment and the
 operator-level findings. A stronger peer-reviewed submission would add a
-public reproducibility release, several boards, controlled listener ratings,
-power measurements, I2S playback, and comparisons against at least one
-purpose-built MCU vocoder. Achieving faster-than-real-time generation with a
-trained causal or spectral decoder would constitute a separate model result.
+several-board replication, controlled listener ratings, power measurements,
+I2S playback, and comparisons against at least one purpose-built MCU vocoder.
+Achieving faster-than-real-time generation with a trained causal or spectral
+decoder would constitute a separate model result.
 
 \section{Conclusion}
 

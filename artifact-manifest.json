@@ -1,9 +1,13 @@
 {
   "schema_version": 1,
-  "paper_snapshot_commit": "336e7670a4e6a540d8841df35f8d9b3da3fae23f",
+  "original_paper_snapshot_commit": "336e7670a4e6a540d8841df35f8d9b3da3fae23f",
   "runtime_release_commit": "f5701f9f92e92522086233d6c10879c07740b10f",
+  "supplemental_evidence_commit": "d73897194ae034cf8a13d87add01ca15f99799f8",
   "runtime_source_commit": "f14bf17d91eb5835dee93e8dc6f5b80ef8b57a09",
-  "model_distribution": "https://huggingface.co/inlanger/inflect-nano-v2-esp32p4-espdl",
+  "model_distribution": {
+    "repository": "https://huggingface.co/inlanger/inflect-nano-v2-esp32p4-espdl",
+    "revision": "282a7eaf953e8a9e972b86d844d1d2823a48df21"
+  },
   "upstream_model": {
     "repository": "owensong/Inflect-Nano-v2",
     "revision": "1cbf8079a95a87e013999321fb79fda8b9025238",

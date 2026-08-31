@@ -55,7 +55,7 @@ The exact captured result is in `evidence/ready-flow48/`:
 - `tools/run_inflect_p4_service.py`: raw-text request and verified WAV capture.
 - `evidence/ready-flow48/`: retained board output and machine-readable telemetry.
 - `evidence/decoder-surface/`: sanitized supplemental decoder analysis.
-- `paper/`: immutable publication snapshot.
+- `paper/`: article source, rendered PDF, metadata, and arXiv source archive.
 
 Experimental G5-G18 decoders, rejected pruning routes, training corpora, and
 diagnostic builds are intentionally absent.

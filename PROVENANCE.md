@@ -4,6 +4,9 @@
 
 - Public repository: `https://github.com/inlanger/esp32-p4-inflect-tts`
 - Original paper snapshot: `336e7670a4e6a540d8841df35f8d9b3da3fae23f`
+- Exact runtime/artifact release: `f5701f9f92e92522086233d6c10879c07740b10f`
+- Supplemental decoder evidence: `d73897194ae034cf8a13d87add01ca15f99799f8`
+- Hugging Face model revision: `282a7eaf953e8a9e972b86d844d1d2823a48df21`
 - Runtime source boundary: `f14bf17d91eb5835dee93e8dc6f5b80ef8b57a09`
 - Source boundary message: `feat: deploy exact Flow48 short-value route`
 
