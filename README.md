@@ -6,6 +6,10 @@ text-to-waveform deployment of
 [Inflect-Nano-v2](https://huggingface.co/owensong/Inflect-Nano-v2) on an
 ESP32-P4.
 
+The compact ESP-DL model package, retained board audio, and machine-readable
+artifact manifest are also published at
+[inlanger/inflect-nano-v2-esp32p4-espdl](https://huggingface.co/inlanger/inflect-nano-v2-esp32p4-espdl).
+
 The ESP32-P4 receives raw UTF-8 text and performs all speech work locally:
 
 - normalization and eSpeak-NG phonemization;
