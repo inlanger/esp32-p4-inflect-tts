@@ -4,3 +4,14 @@
 *.log
 *.out
 *.synctex.gz
+.venv/
+__pycache__/
+*.pyc
+third_party/esp-dl/
+/build-release/
+/inflect_full_assets_aligned.S
+embedded/**/managed_components/
+embedded/inflect_p4_bench/build*/
+embedded/inflect_p4_bench/sdkconfig
+embedded/inflect_p4_bench/sdkconfig.old
+captures/

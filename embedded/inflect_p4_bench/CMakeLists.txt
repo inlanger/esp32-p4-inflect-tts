@@ -1,0 +1,56 @@
+cmake_minimum_required(VERSION 3.16)
+
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+idf_build_set_property(MINIMAL_BUILD ON)
+
+option(INFLECT_RUNTIME_PRUNE_K3 "Skip the decoder k3 residual branches in the retained package" OFF)
+if(INFLECT_RUNTIME_PRUNE_K3)
+    idf_build_set_property(COMPILE_DEFINITIONS "INFLECT_RUNTIME_PRUNE_K3=1" APPEND)
+endif()
+
+option(INFLECT_RUNTIME_COPY_K3_MERGES "Copy the retained branch at pruned decoder k3 merges" OFF)
+if(INFLECT_RUNTIME_COPY_K3_MERGES)
+    if(NOT INFLECT_RUNTIME_PRUNE_K3)
+        message(FATAL_ERROR "INFLECT_RUNTIME_COPY_K3_MERGES requires INFLECT_RUNTIME_PRUNE_K3")
+    endif()
+    idf_build_set_property(COMPILE_DEFINITIONS "INFLECT_RUNTIME_COPY_K3_MERGES=1" APPEND)
+endif()
+
+option(INFLECT_RUNTIME_DIV2_REQUANT "Replace pruned-decoder division by two with P4 requantization" OFF)
+if(INFLECT_RUNTIME_DIV2_REQUANT)
+    if(NOT INFLECT_RUNTIME_PRUNE_K3)
+        message(FATAL_ERROR "INFLECT_RUNTIME_DIV2_REQUANT requires INFLECT_RUNTIME_PRUNE_K3")
+    endif()
+    idf_build_set_property(COMPILE_DEFINITIONS "INFLECT_RUNTIME_DIV2_REQUANT=1" APPEND)
+endif()
+
+option(INFLECT_RUNTIME_PRUNE_K7_TAIL "Skip the third residual update in retained decoder k7 branches" OFF)
+if(INFLECT_RUNTIME_PRUNE_K7_TAIL)
+    if(NOT INFLECT_RUNTIME_PRUNE_K3)
+        message(FATAL_ERROR "INFLECT_RUNTIME_PRUNE_K7_TAIL requires INFLECT_RUNTIME_PRUNE_K3")
+    endif()
+    idf_build_set_property(COMPILE_DEFINITIONS "INFLECT_RUNTIME_PRUNE_K7_TAIL=1" APPEND)
+endif()
+
+option(INFLECT_RUNTIME_PRUNE_K7_SECOND "Skip the second residual update in retained decoder k7 branches" OFF)
+if(INFLECT_RUNTIME_PRUNE_K7_SECOND)
+    if(NOT INFLECT_RUNTIME_PRUNE_K7_TAIL)
+        message(FATAL_ERROR "INFLECT_RUNTIME_PRUNE_K7_SECOND requires INFLECT_RUNTIME_PRUNE_K7_TAIL")
+    endif()
+    idf_build_set_property(COMPILE_DEFINITIONS "INFLECT_RUNTIME_PRUNE_K7_SECOND=1" APPEND)
+endif()
+
+option(INFLECT_RUNTIME_BYPASS_K7_MERGES "Bypass in-place k7 merges whose pruned residual is zero" OFF)
+if(INFLECT_RUNTIME_BYPASS_K7_MERGES)
+    if(NOT INFLECT_RUNTIME_PRUNE_K7_SECOND)
+        message(FATAL_ERROR "INFLECT_RUNTIME_BYPASS_K7_MERGES requires INFLECT_RUNTIME_PRUNE_K7_SECOND")
+    endif()
+    idf_build_set_property(COMPILE_DEFINITIONS "INFLECT_RUNTIME_BYPASS_K7_MERGES=1" APPEND)
+endif()
+
+option(INFLECT_FLOW96 "Route short requests through a masked 96-frame reverse-flow graph" OFF)
+
+set(PROJECT_VER "0.1.0")
+project(inflect_p4_bench)
+
+fatfs_create_rawflash_image(g2p g2p_data FLASH_IN_PROJECT ONE_FAT)

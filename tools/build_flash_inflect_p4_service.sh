@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PROJECT_DIR="$ROOT_DIR/embedded/inflect_p4_bench"
+IDF_DIR="${IDF_DIR:-$HOME/esp/esp-idf-v6.0.2}"
+BUILD_DIR="${BUILD_DIR:-/tmp/inflect-p4-service-build}"
+SDKCONFIG="${SDKCONFIG:-/tmp/inflect-p4-service-sdkconfig}"
+PORT="${PORT:-/dev/cu.usbserial-3110}"
+PROFILE_DECODER="${PROFILE_DECODER:-OFF}"
+BENCH_INTERLEAVE="${BENCH_INTERLEAVE:-OFF}"
+BENCH_PRIMITIVES="${BENCH_PRIMITIVES:-OFF}"
+BENCH_STUDENTS="${BENCH_STUDENTS:-OFF}"
+RUNTIME_PRUNE_K3="${RUNTIME_PRUNE_K3:-OFF}"
+RUNTIME_COPY_K3_MERGES="${RUNTIME_COPY_K3_MERGES:-OFF}"
+RUNTIME_DIV2_REQUANT="${RUNTIME_DIV2_REQUANT:-OFF}"
+RUNTIME_PRUNE_K7_TAIL="${RUNTIME_PRUNE_K7_TAIL:-OFF}"
+RUNTIME_PRUNE_K7_SECOND="${RUNTIME_PRUNE_K7_SECOND:-OFF}"
+RUNTIME_BYPASS_K7_MERGES="${RUNTIME_BYPASS_K7_MERGES:-OFF}"
+FLOW96="${FLOW96:-ON}"
+SHORT_VALUE64="${SHORT_VALUE64:-ON}"
+DECODER_FULL_PSRAM_PAD_BYTES="${DECODER_FULL_PSRAM_PAD_BYTES:-0}"
+PRELOAD_FULL_DECODER="${PRELOAD_FULL_DECODER:-OFF}"
+DECODER_TILE96="${DECODER_TILE96:-OFF}"
+DECODER_BRIDGE96_69="${DECODER_BRIDGE96_69:-OFF}"
+ESPDL_TEXT_PAD_BYTES="${ESPDL_TEXT_PAD_BYTES:-0}"
+
+"$ROOT_DIR/tools/prepare_esp_dl.sh"
+source "$IDF_DIR/export.sh" >/dev/null 2>&1
+
+# Kconfig defaults only initialize missing values; discard the generated
+# temporary config so every service build actually uses the pinned defaults.
+rm -f "$SDKCONFIG" "$SDKCONFIG.old"
+
+cmake -S "$PROJECT_DIR" -B "$BUILD_DIR" -G "Unix Makefiles" \
+  -DESP_PLATFORM=1 \
+  -DIDF_TARGET=esp32p4 \
+  -DSDKCONFIG="$SDKCONFIG" \
+  -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.cache512.defaults;sdkconfig.service.defaults" \
+  -DINFLECT_COMMAND_LOOP=ON \
+  -DINFLECT_PERSIST_MODELS=ON \
+  -DINFLECT_VALIDATE_CANARIES=OFF \
+  -DINFLECT_PRELOAD_FULL_DECODER="$PRELOAD_FULL_DECODER" \
+  -DINFLECT_DECODER_TILE96="$DECODER_TILE96" \
+  -DINFLECT_DECODER_BRIDGE96_69="$DECODER_BRIDGE96_69" \
+  -DINFLECT_EMIT_PCM_HEX=OFF \
+  -DINFLECT_PROFILE_DECODER="$PROFILE_DECODER" \
+  -DINFLECT_BENCH_INTERLEAVE="$BENCH_INTERLEAVE" \
+  -DINFLECT_BENCH_PRIMITIVES="$BENCH_PRIMITIVES" \
+  -DINFLECT_BENCH_STUDENTS="$BENCH_STUDENTS" \
+  -DINFLECT_RUNTIME_PRUNE_K3="$RUNTIME_PRUNE_K3" \
+  -DINFLECT_RUNTIME_COPY_K3_MERGES="$RUNTIME_COPY_K3_MERGES" \
+  -DINFLECT_RUNTIME_DIV2_REQUANT="$RUNTIME_DIV2_REQUANT" \
+  -DINFLECT_RUNTIME_PRUNE_K7_TAIL="$RUNTIME_PRUNE_K7_TAIL" \
+  -DINFLECT_RUNTIME_PRUNE_K7_SECOND="$RUNTIME_PRUNE_K7_SECOND" \
+  -DINFLECT_RUNTIME_BYPASS_K7_MERGES="$RUNTIME_BYPASS_K7_MERGES" \
+  -DINFLECT_FLOW96="$FLOW96" \
+  -DINFLECT_SHORT_VALUE64="$SHORT_VALUE64" \
+  -DINFLECT_DECODER_INTERNAL_BYTES=0 \
+  -DINFLECT_DECODER_FULL_PSRAM_PAD_BYTES="$DECODER_FULL_PSRAM_PAD_BYTES" \
+  -DINFLECT_ESPDL_TEXT_PAD_BYTES="$ESPDL_TEXT_PAD_BYTES"
+
+cmake --build "$BUILD_DIR" -j
+
+# Provision the app and raw-text frontend. The 8.125 MiB model partition stays
+# at 0x410000; g2p and the optional short-flow partition move by 128 KiB.
+flash_args=(
+  0x8000 "$BUILD_DIR/partition_table/partition-table.bin"
+  0x10000 "$BUILD_DIR/inflect_p4_bench.bin"
+  0xc30000 "$BUILD_DIR/g2p.bin"
+)
+if [[ "$FLOW96" == "ON" ]]; then
+  flash_args+=(0xd30000 "$BUILD_DIR/inflect_flow96_models.espdl")
+fi
+python -m esptool --chip esp32p4 -p "$PORT" -b 460800 \
+  --before default-reset --after hard-reset write-flash \
+  "${flash_args[@]}"
+
+if [[ "$SHORT_VALUE64" == "ON" ]]; then
+  "$ROOT_DIR/tools/flash_espdl_package_chunks.py" \
+    "$BUILD_DIR/inflect_tts_models.espdl" \
+    --port "$PORT" \
+    --partition-bytes 0x820000 \
+    --baud 460800
+fi

@@ -1,0 +1,7 @@
+# Name,    Type, SubType, Offset,   Size, Flags
+nvs,       data, nvs,     0x9000,    24K,
+phy_init,  data, phy,     0xf000,     4K,
+factory,   app,  factory, 0x10000,    4M,
+model,     data, spiffs,  ,       0x820000,
+g2p,       data, fat,     ,            1M,
+flow_short,data, spiffs,  0xd30000,     2M,

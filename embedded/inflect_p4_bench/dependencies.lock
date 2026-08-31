@@ -1,0 +1,68 @@
+dependencies:
+  espressif/dl_fft:
+    component_hash: a955ca29581de2177ddf25759273bd83f082b3c805e735fe6ee105858643989b
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=5.0'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 0.6.0
+  espressif/esp-dl:
+    dependencies:
+    - name: espressif/dl_fft
+      version: '>=0.6.0'
+    - name: espressif/esp_new_jpeg
+      version: ^1
+    - matches:
+      - if: target in ["esp32", "esp32c2", "esp32c3", "esp32c6", "esp32p4", "esp32s2", "esp32s3"]
+        version: '>=5.3'
+      - if: target == esp32c5
+        version: '>=5.5'
+      - if: target == esp32s31
+        version: '>=6.0'
+      name: idf
+    source:
+      path: ../../third_party/esp-dl
+      type: local
+    targets:
+    - esp32
+    - esp32c2
+    - esp32c3
+    - esp32c5
+    - esp32c6
+    - esp32p4
+    - esp32s2
+    - esp32s3
+    - esp32s31
+    version: 3.3.9
+  espressif/esp_new_jpeg:
+    component_hash: e1e7e6991193c41ed6c9fc386702aa7821433319e7aa9c3147cd3236310cd69c
+    dependencies: []
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    targets:
+    - esp32
+    - esp32s2
+    - esp32s3
+    - esp32s31
+    - esp32p4
+    - esp32c2
+    - esp32c3
+    - esp32c5
+    - esp32c6
+    - esp32c61
+    - esp32h4
+    version: 1.0.2
+  idf:
+    source:
+      type: idf
+    version: 6.0.2
+direct_dependencies:
+- espressif/esp-dl
+- idf
+manifest_hash: 8718ab9a3e273aa21460d0d1ed1bd30844e39ddf38a356f5182799ac0c362162
+target: esp32p4
+version: 3.0.0

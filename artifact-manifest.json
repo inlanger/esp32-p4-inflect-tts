@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "publication_commit": "336e7670a4e6a540d8841df35f8d9b3da3fae23f",
+  "runtime_source_commit": "f14bf17d91eb5835dee93e8dc6f5b80ef8b57a09",
+  "upstream_model": {
+    "repository": "owensong/Inflect-Nano-v2",
+    "revision": "1cbf8079a95a87e013999321fb79fda8b9025238",
+    "checkpoint_sha256": "bfca468489c9069361d6b87b295a17eef611af8ff09854ce0b80305d9122f5b3"
+  },
+  "artifacts": [
+    {
+      "path": "embedded/inflect_p4_bench/main/inflect_tts_models_short64.espdl",
+      "bytes": 8409632,
+      "sha256": "3a267b2310a36ad5cc561e5ac3da78ee89aec66fb3b4c7df3abbd43280304bb9"
+    },
+    {
+      "path": "embedded/inflect_p4_bench/main/inflect_flow96_models.espdl",
+      "bytes": 1345632,
+      "sha256": "64d1c0d2377606a4217400fbfbf4e897816c1ea530445ec5f3c0bd7ca3526ce9"
+    },
+    {
+      "path": "embedded/inflect_p4_bench/main/inflect_full_assets.bin",
+      "bytes": 86198,
+      "sha256": "9bd2c044b3f940792a0e97224420c6195f65635bdb17582025108930886203dc"
+    },
+    {
+      "path": "patches/esp-dl-3.3.9-inflect.patch",
+      "bytes": 54185,
+      "sha256": "63f087bf481fe4689fa586bb2bcfa882d7a2c361aa363b99c6a65e5127d87caa"
+    },
+    {
+      "path": "evidence/ready-flow48/ready-flow48.wav",
+      "bytes": 22572,
+      "sha256": "add6b5be3e21278a46837c5a0269cee9392bbf6dc6081327082797963fd381b8"
+    },
+    {
+      "path": "evidence/ready-flow48/ready-flow48.json",
+      "bytes": 2351,
+      "sha256": "17e17cb633b26863ae7c990cae0e0529f4fcec9c5917ffdca7eaa8b21500ec31"
+    }
+  ]
+}

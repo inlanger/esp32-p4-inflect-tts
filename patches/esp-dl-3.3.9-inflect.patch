@@ -1,0 +1,1329 @@
+diff --git a/dl/base/dl_base.hpp b/dl/base/dl_base.hpp
+index 48f037b..01cb79e 100644
+--- a/dl/base/dl_base.hpp
++++ b/dl/base/dl_base.hpp
+@@ -349,6 +349,34 @@ public:
+                 m_args[1].output_element +=
+                     (args.output_height - m_args[1].output_height) * args.output_width * args.output_channel;
+             }
++        } else if (input->shape.size() == 3 && group == 1 &&
++                   args.input_width > 4 * args.dilation_w * args.filter_width) {
++            if (runtime_mode == RUNTIME_MODE_MULTI_CORE ||
++                (runtime_mode == RUNTIME_MODE_AUTO && args.input_width >= 100)) {
++                m_args.push_back(args);
++
++                // Conv1D is represented as H=1, W=time, so split its temporal axis.
++                const int dilation_filter_width = args.dilation_w * (args.filter_width - 1) + 1;
++                const int half_step =
++                    (args.padding_w_head + args.padding_w_tail + args.input_width - dilation_filter_width) /
++                    args.stride_x / 2;
++
++                // Left output region and the minimal input interval that produces it.
++                m_args[0].input_width =
++                    dilation_filter_width - args.padding_w_head + half_step * args.stride_x;
++                m_args[0].padding_w_tail = 0;
++                m_args[0].output_width = half_step + 1;
++
++                // Right output region, including only the receptive-field overlap.
++                m_args[1].padding_w_head = 0;
++                m_args[1].input_width =
++                    dilation_filter_width - args.stride_x + args.input_width - m_args[0].input_width;
++                m_args[1].input_element +=
++                    (args.input_width - m_args[1].input_width) * args.input_channel;
++                m_args[1].output_width = args.output_width - m_args[0].output_width;
++                m_args[1].output_element +=
++                    (args.output_width - m_args[1].output_width) * args.output_channel;
++            }
+         }
+     }
+ 
+diff --git a/dl/base/dl_base_lut.cpp b/dl/base/dl_base_lut.cpp
+index 992bdff..44fd168 100644
+--- a/dl/base/dl_base_lut.cpp
++++ b/dl/base/dl_base_lut.cpp
+@@ -7,6 +7,65 @@
+ namespace dl {
+ namespace base {
+ 
++namespace {
++
++enum formula_correction_t : int32_t {
++    FORMULA_CORRECTION_NONE = 0,
++    FORMULA_CORRECTION_TENTHS,
++    FORMULA_CORRECTION_TWENTIETHS,
++    FORMULA_CORRECTION_FIFTIETHS,
++};
++
++struct FormulaSpec {
++    int32_t positive_numerator;
++    int32_t positive_denominator;
++    int32_t negative_numerator;
++    int32_t negative_denominator;
++    int16_t p4_negative_multiplier;
++    int16_t p4_positive_multiplier;
++    uint8_t p4_negative_shift;
++    uint8_t p4_positive_shift;
++    formula_correction_t p4_correction;
++};
++
++constexpr FormulaSpec kFormulaSpecs[] = {
++    {0, 1, 0, 1, 0, 0, 0, 0, FORMULA_CORRECTION_NONE},
++    {1, 2, 1, 20, 51, 1, 10, 1, FORMULA_CORRECTION_TWENTIETHS},
++    {1, 1, 1, 100, 81, 1, 13, 0, FORMULA_CORRECTION_NONE},
++    {1, 1, 1, 10, 51, 1, 9, 0, FORMULA_CORRECTION_TENTHS},
++    {2, 1, 1, 50, 163, 2, 13, 0, FORMULA_CORRECTION_FIFTIETHS},
++    {2, 1, 1, 5, 51, 2, 8, 0, FORMULA_CORRECTION_NONE},
++    {4, 1, 2, 5, 205, 4, 9, 0, FORMULA_CORRECTION_NONE},
++    {8, 1, 4, 5, 205, 8, 8, 0, FORMULA_CORRECTION_NONE},
++};
++
++static int32_t round_half_even_ratio(int32_t value, int32_t numerator, int32_t denominator)
++{
++    int32_t product = value * numerator;
++    bool negative = product < 0;
++    uint32_t magnitude = static_cast<uint32_t>(negative ? -product : product);
++    uint32_t quotient = magnitude / static_cast<uint32_t>(denominator);
++    uint32_t remainder = magnitude % static_cast<uint32_t>(denominator);
++    uint32_t twice_remainder = remainder * 2;
++    if (twice_remainder > static_cast<uint32_t>(denominator) ||
++        (twice_remainder == static_cast<uint32_t>(denominator) && (quotient & 1u))) {
++        ++quotient;
++    }
++    return negative ? -static_cast<int32_t>(quotient) : static_cast<int32_t>(quotient);
++}
++
++static int8_t formula_value(int8_t input, lut_s8_formula_t formula)
++{
++    const FormulaSpec &spec = kFormulaSpecs[static_cast<unsigned>(formula)];
++    int32_t value = input < 0
++        ? round_half_even_ratio(input, spec.negative_numerator, spec.negative_denominator)
++        : round_half_even_ratio(input, spec.positive_numerator, spec.positive_denominator);
++    value = value < -128 ? -128 : (value > 127 ? 127 : value);
++    return static_cast<int8_t>(value);
++}
++
++} // namespace
++
+ static void lut_s8_c(int8_t *output, const int8_t *input, int32_t size, const int8_t *table)
+ {
+     for (int32_t i = 0; i < size; i++) {
+@@ -47,6 +106,65 @@ void lut_s8(int8_t *output, const int8_t *input, int32_t size, const int8_t *tab
+     lut_s8_c(output + processed, input + processed, size - processed, table);
+ }
+ 
++lut_s8_formula_t classify_lut_s8_formula(const int8_t *table)
++{
++    if (table == nullptr) {
++        return LUT_S8_FORMULA_NONE;
++    }
++    for (unsigned candidate = LUT_S8_FORMULA_SCALE_HALF_ALPHA_010;
++         candidate <= LUT_S8_FORMULA_SCALE_8_ALPHA_010;
++         ++candidate) {
++        const auto formula = static_cast<lut_s8_formula_t>(candidate);
++        bool matches = true;
++        for (int32_t value = -128; value < 128; ++value) {
++            const auto input = static_cast<int8_t>(value);
++            const uint8_t index = static_cast<uint8_t>(input) ^ 0x80u;
++            if (table[index] != formula_value(input, formula)) {
++                matches = false;
++                break;
++            }
++        }
++        if (matches) {
++            return formula;
++        }
++    }
++    return LUT_S8_FORMULA_NONE;
++}
++
++void lut_s8_formula(int8_t *output, const int8_t *input, int32_t size, lut_s8_formula_t formula)
++{
++    assert(output);
++    assert(input);
++    assert(formula > LUT_S8_FORMULA_NONE && formula <= LUT_S8_FORMULA_SCALE_8_ALPHA_010);
++    if (size <= 0) {
++        return;
++    }
++
++    int32_t processed = 0;
++#if CONFIG_PIE_V2_BOOST
++    const bool aligned = !(reinterpret_cast<uintptr_t>(output) & 0xf) &&
++        !(reinterpret_cast<uintptr_t>(input) & 0xf);
++    const int32_t simd_size = size & ~0xf;
++    if (aligned && simd_size > 0) {
++        const FormulaSpec &spec = kFormulaSpecs[static_cast<unsigned>(formula)];
++        dl_esp32p4_cfg_round(ROUND_MODE_HALF_EVEN);
++        dl_esp32p4_s8_leaky_formula(output,
++                                    const_cast<int8_t *>(input),
++                                    simd_size / 16,
++                                    spec.p4_negative_multiplier,
++                                    spec.p4_negative_shift,
++                                    spec.p4_positive_multiplier,
++                                    spec.p4_positive_shift,
++                                    spec.p4_correction);
++        processed = simd_size;
++    }
++#endif
++
++    for (int32_t index = processed; index < size; ++index) {
++        output[index] = formula_value(input[index], formula);
++    }
++}
++
+ static inline uint32_t lut_index(int16_t input, int32_t shift)
+ {
+     uint32_t value = static_cast<uint16_t>(input) ^ 0x8000u;
+diff --git a/dl/base/dl_base_lut.hpp b/dl/base/dl_base_lut.hpp
+index 97000af..9f2ce4e 100644
+--- a/dl/base/dl_base_lut.hpp
++++ b/dl/base/dl_base_lut.hpp
+@@ -5,6 +5,17 @@
+ namespace dl {
+ namespace base {
+ 
++enum lut_s8_formula_t : uint8_t {
++    LUT_S8_FORMULA_NONE = 0,
++    LUT_S8_FORMULA_SCALE_HALF_ALPHA_010,
++    LUT_S8_FORMULA_SCALE_1_ALPHA_001,
++    LUT_S8_FORMULA_SCALE_1_ALPHA_010,
++    LUT_S8_FORMULA_SCALE_2_ALPHA_001,
++    LUT_S8_FORMULA_SCALE_2_ALPHA_010,
++    LUT_S8_FORMULA_SCALE_4_ALPHA_010,
++    LUT_S8_FORMULA_SCALE_8_ALPHA_010,
++};
++
+ /**
+  * @brief Apply an int8 lookup table.
+  *
+@@ -20,6 +31,12 @@ namespace base {
+  */
+ void lut_s8(int8_t *output, const int8_t *input, int32_t size, const int8_t *table);
+ 
++/** Return a proven piecewise formula for @p table, or NONE for generic LUTs. */
++lut_s8_formula_t classify_lut_s8_formula(const int8_t *table);
++
++/** Apply a formula previously returned by classify_lut_s8_formula(). */
++void lut_s8_formula(int8_t *output, const int8_t *input, int32_t size, lut_s8_formula_t formula);
++
+ /**
+  * @brief Apply an int16 nearest-neighbor lookup table.
+  *
+diff --git a/dl/base/isa/esp32p4/dl_base_esp32p4.h b/dl/base/isa/esp32p4/dl_base_esp32p4.h
+index 71fabb6..7fb7e44 100644
+--- a/dl/base/isa/esp32p4/dl_base_esp32p4.h
++++ b/dl/base/isa/esp32p4/dl_base_esp32p4.h
+@@ -852,5 +852,13 @@ void dl_esp32p4_rmsnorm_s16(int16_t *output, int16_t *input, float *scale, float
+ 
+ /* LUT API */
+ void dl_esp32p4_s8_lut(int8_t *output, int8_t *input, int32_t n_8, int8_t *table);
++void dl_esp32p4_s8_leaky_formula(int8_t *output,
++                                 int8_t *input,
++                                 int32_t n_16,
++                                 int32_t negative_multiplier,
++                                 int32_t negative_shift,
++                                 int32_t positive_multiplier,
++                                 int32_t positive_shift,
++                                 int32_t correction);
+ void dl_esp32p4_s16_lut_nearest_neighbor(int16_t *output, int16_t *input, int32_t n_8, int16_t *table, int32_t shift);
+ }
+diff --git a/dl/base/isa/esp32p4/dl_esp32p4_leaky_formula.S b/dl/base/isa/esp32p4/dl_esp32p4_leaky_formula.S
+new file mode 100644
+index 0000000..f9c6268
+--- /dev/null
++++ b/dl/base/isa/esp32p4/dl_esp32p4_leaky_formula.S
+@@ -0,0 +1,117 @@
++#include "dl_esp32p4_s8.S"
++
++    .section .rodata
++    .align 4
++.L_formula_tenths_corrections:
++    .byte -115, -95, -75, -55, -35, -15
++.L_formula_twentieths_corrections:
++    .byte -110, -70, -30
++.L_formula_fiftieths_corrections:
++    .byte -75
++
++    .macro load_broadcast_s16 output, value, temporary
++        slli             \temporary, \value, 16
++        or               \temporary, \temporary, \value
++        esp.movi.32.q    \output, \temporary, 0
++        esp.movi.32.q    \output, \temporary, 1
++        esp.movi.32.q    \output, \temporary, 2
++        esp.movi.32.q    \output, \temporary, 3
++    .endm
++
++    .macro leaky_formula_block correction_count
++        esp.vld.128.ip       q7, a1, 16
++        esp.vext.s8          q0, q1, q7
++
++        esp.zero.qacc
++        esp.vmulas.s16.qacc  q0, q2
++        esp.srcmb.s8.qacc    q3, a4, 1
++        esp.zero.qacc
++        esp.vmulas.s16.qacc  q1, q2
++        esp.srcmb.s8.qacc    q5, a4, 1
++        esp.vunzip.8         q3, q5
++
++        esp.zero.qacc
++        esp.vmulas.s16.qacc  q0, q4
++        esp.srcmb.s8.qacc    q5, t3, 1
++        esp.zero.qacc
++        esp.vmulas.s16.qacc  q1, q4
++        esp.srcmb.s8.qacc    q6, t3, 1
++        esp.vunzip.8         q5, q6
++
++        .if \correction_count
++            esp.zero.q       q1
++            .rept \correction_count
++                esp.vldbc.8.ip   q0, t5, 1
++                esp.vcmp.eq.s8   q6, q7, q0
++                esp.orq          q1, q1, q6
++            .endr
++            addi             t5, t5, -\correction_count
++            esp.vadd.s8      q3, q3, q1
++        .endif
++
++        esp.zero.q           q0
++        esp.vcmp.lt.s8       q6, q7, q0
++        esp.andq             q3, q3, q6
++        esp.vcmp.gt.s8       q6, q7, q0
++        esp.andq             q5, q5, q6
++        esp.vadd.s8          q3, q3, q5
++        esp.vst.128.ip       q3, a0, 16
++    .endm
++
++    .text
++    .align 4
++    .global dl_esp32p4_s8_leaky_formula
++    .type dl_esp32p4_s8_leaky_formula, @function
++dl_esp32p4_s8_leaky_formula:
++    # a0 output, a1 input, a2 blocks of 16
++    # a3 negative multiplier, a4 negative shift
++    # a5 positive multiplier, a6 positive shift, a7 correction class
++    load_broadcast_s16 q2, a3, t3
++    load_broadcast_s16 q4, a5, t4
++    mv               t3, a6
++
++    beqz             a7, .L_formula_no_correction
++    li               t4, 1
++    beq              a7, t4, .L_formula_tenths
++    li               t4, 2
++    beq              a7, t4, .L_formula_twentieths
++    j                .L_formula_fiftieths
++
++.L_formula_no_correction:
++    beqz             a2, .L_formula_done
++.L_formula_no_correction_loop:
++    leaky_formula_block 0
++    addi             a2, a2, -1
++    bnez             a2, .L_formula_no_correction_loop
++    j                .L_formula_done
++
++.L_formula_tenths:
++    la               t5, .L_formula_tenths_corrections
++    beqz             a2, .L_formula_done
++.L_formula_tenths_loop:
++    leaky_formula_block 6
++    addi             a2, a2, -1
++    bnez             a2, .L_formula_tenths_loop
++    j                .L_formula_done
++
++.L_formula_twentieths:
++    la               t5, .L_formula_twentieths_corrections
++    beqz             a2, .L_formula_done
++.L_formula_twentieths_loop:
++    leaky_formula_block 3
++    addi             a2, a2, -1
++    bnez             a2, .L_formula_twentieths_loop
++    j                .L_formula_done
++
++.L_formula_fiftieths:
++    la               t5, .L_formula_fiftieths_corrections
++    beqz             a2, .L_formula_done
++.L_formula_fiftieths_loop:
++    leaky_formula_block 1
++    addi             a2, a2, -1
++    bnez             a2, .L_formula_fiftieths_loop
++
++.L_formula_done:
++    ret
++
++    .size dl_esp32p4_s8_leaky_formula, .-dl_esp32p4_s8_leaky_formula
+diff --git a/dl/base/isa/esp32p4/dl_esp32p4_s8_requantize_linear.S b/dl/base/isa/esp32p4/dl_esp32p4_s8_requantize_linear.S
+index 01bb0cd..cb96a47 100644
+--- a/dl/base/isa/esp32p4/dl_esp32p4_s8_requantize_linear.S
++++ b/dl/base/isa/esp32p4/dl_esp32p4_s8_requantize_linear.S
+@@ -63,6 +63,12 @@ dl_esp32p4_s8_s8_requantize_linear:
+ 
+     esp32p4_s8_s8_requantize_linear_left_shift:
+ 
++        // Multiplication by two is saturating addition in signed INT8. This
++        // avoids the QACC left-shift path, whose first invocation is not
++        // bit-exact on the P4 revision used by the decoder benchmark.
++        li  a5, 2
++        beq  t4, a5, esp32p4_s8_s8_requantize_linear_saturating_double
++
+         addi  t4, a2, 24
+         esp.vldbc.16.ip  q2, t4, 0      // load output_scale
+         beqz  a3, esp32p4_s8_s8_requantize_linear_left_shift_remainder
+@@ -92,6 +98,24 @@ dl_esp32p4_s8_s8_requantize_linear:
+             esp.vunzip.8  q0, q1
+             dl_esp32p4_s8_store_remainder  q0, a3, a5, t3, t4, t0, a0, a4
+ 
++        j  esp32p4_s8_s8_requantize_linear_end
++
++    esp32p4_s8_s8_requantize_linear_saturating_double:
++        beqz  a3, esp32p4_s8_s8_requantize_linear_saturating_double_remainder
++
++        esp32p4_s8_s8_requantize_linear_saturating_double_loop:
++            esp.vld.128.ip  q0, a1, 16
++            esp.vadd.s8  q1, q0, q0
++            esp.vst.128.ip  q1, a0, 16
++            addi  a3, a3, -1
++            bnez  a3, esp32p4_s8_s8_requantize_linear_saturating_double_loop
++
++        esp32p4_s8_s8_requantize_linear_saturating_double_remainder:
++            beqz  a4, esp32p4_s8_s8_requantize_linear_end
++            esp.vld.128.xp  q0, a1, a4
++            esp.vadd.s8  q1, q0, q0
++            dl_esp32p4_s8_store_remainder  q1, a3, a5, t3, t4, t0, a0, a4
++
+     esp32p4_s8_s8_requantize_linear_end:
+     ret
+ 
+diff --git a/dl/model/include/dl_model_base.hpp b/dl/model/include/dl_model_base.hpp
+index e6f8847..1d5439c 100644
+--- a/dl/model/include/dl_model_base.hpp
++++ b/dl/model/include/dl_model_base.hpp
+@@ -58,6 +58,21 @@ private:
+     size_t m_internal_size;                        /*!< Internal RAM usage */
+     size_t m_psram_size;                           /*!< PSRAM usage */
+ 
++#if defined(INFLECT_RUNTIME_PRUNE_K3)
++    bool m_runtime_prune_k3 = false;
++    std::vector<std::string> m_execution_names;
++    void configure_runtime_k3_pruning();
++#if defined(INFLECT_RUNTIME_COPY_K3_MERGES)
++    bool m_runtime_copy_k3_merges = false;
++    void configure_runtime_k3_merge_copy();
++#endif
++#if defined(INFLECT_RUNTIME_BYPASS_K7_MERGES)
++    bool m_runtime_bypass_k7_merges = false;
++    void configure_runtime_k7_merge_bypass();
++#endif
++#endif
++    bool forward_module(size_t execution_index, runtime_mode_t mode);
++
+ public:
+     Model() {}
+ 
+@@ -335,7 +350,8 @@ public:
+      *
+      * @return return Type and latency of each module.
+      */
+-    std::map<std::string, module_info> get_module_info();
++    std::map<std::string, module_info> get_module_info(
++        runtime_mode_t mode = RUNTIME_MODE_SINGLE_CORE);
+ 
+     /**
+      * @brief Print the module info obtained by get_module_info function.
+diff --git a/dl/model/src/dl_model_base.cpp b/dl/model/src/dl_model_base.cpp
+index 2adeebd..debc6d0 100644
+--- a/dl/model/src/dl_model_base.cpp
++++ b/dl/model/src/dl_model_base.cpp
+@@ -1,15 +1,191 @@
+ #include <stdint.h>
+ 
++#include "dl_base_requantize_linear.hpp"
+ #include "dl_memory_manager_greedy.hpp"
+ #include "dl_model_base.hpp"
+ #include "dl_module_creator.hpp"
+ #include "fbs_model.hpp"
++#include <cmath>
++#include <cstring>
+ #include <format>
++#include <limits>
+ 
+ static const char *TAG = "dl::Model";
+ 
+ namespace dl {
+ 
++#if defined(INFLECT_RUNTIME_PRUNE_K3)
++namespace {
++
++bool has_prefix(const char *name, const char *prefix)
++{
++    return name != nullptr && std::strncmp(name, prefix, std::strlen(prefix)) == 0;
++}
++
++bool is_k3_module(const char *name)
++{
++    return has_prefix(name, "/resblocks.0/") || has_prefix(name, "/resblocks.3/") ||
++        has_prefix(name, "/resblocks.6/") || has_prefix(name, "/resblocks.9/");
++}
++
++bool is_first_stage_merge(const char *name)
++{
++    return name != nullptr && (std::strcmp(name, "/Add") == 0 || std::strcmp(name, "/Add_2") == 0 ||
++                               std::strcmp(name, "/Add_4") == 0 || std::strcmp(name, "/Add_6") == 0);
++}
++
++bool is_stage_div(const char *name)
++{
++    return name != nullptr && (std::strcmp(name, "/Div") == 0 || std::strcmp(name, "/Div_1") == 0 ||
++                               std::strcmp(name, "/Div_2") == 0 || std::strcmp(name, "/Div_3") == 0);
++}
++
++#if defined(INFLECT_RUNTIME_PRUNE_K7_TAIL)
++bool has_suffix(const char *name, const char *suffix)
++{
++    if (name == nullptr || suffix == nullptr) {
++        return false;
++    }
++    const size_t name_length = std::strlen(name);
++    const size_t suffix_length = std::strlen(suffix);
++    return name_length >= suffix_length && std::strcmp(name + name_length - suffix_length, suffix) == 0;
++}
++
++bool is_k7_block_module(const char *name)
++{
++    return has_prefix(name, "/resblocks.1/") || has_prefix(name, "/resblocks.4/") ||
++        has_prefix(name, "/resblocks.7/") || has_prefix(name, "/resblocks.10/");
++}
++
++bool is_k7_tail_module(const char *name)
++{
++    return is_k7_block_module(name) &&
++        (has_suffix(name, "/LeakyRelu_3") || has_suffix(name, "/convs1.2/Conv") ||
++         has_suffix(name, "/LeakyRelu_4") || has_suffix(name, "/convs2.2/Conv"));
++}
++
++bool is_k7_tail_merge(const char *name)
++{
++    return name != nullptr &&
++        (std::strcmp(name, "/resblocks.1/Add_2") == 0 || std::strcmp(name, "/resblocks.4/Add_2") == 0 ||
++         std::strcmp(name, "/resblocks.7/Add_2") == 0 || std::strcmp(name, "/resblocks.10/Add_2") == 0);
++}
++
++#if defined(INFLECT_RUNTIME_PRUNE_K7_SECOND)
++bool is_k7_second_module(const char *name)
++{
++    return is_k7_block_module(name) &&
++        (has_suffix(name, "/LeakyRelu_1") || has_suffix(name, "/convs1.1/Conv") ||
++         has_suffix(name, "/LeakyRelu_2") || has_suffix(name, "/convs2.1/Conv"));
++}
++
++bool is_k7_second_merge(const char *name)
++{
++    return name != nullptr &&
++        (std::strcmp(name, "/resblocks.1/Add_1") == 0 || std::strcmp(name, "/resblocks.4/Add_1") == 0 ||
++         std::strcmp(name, "/resblocks.7/Add_1") == 0 || std::strcmp(name, "/resblocks.10/Add_1") == 0);
++}
++#endif
++
++#if defined(INFLECT_RUNTIME_BYPASS_K7_MERGES)
++bool is_pruned_k7_merge(const char *name)
++{
++    return is_k7_second_merge(name) || is_k7_tail_merge(name);
++}
++#endif
++#endif
++
++template <typename T>
++bool rewrite_divisor(TensorBase *tensor)
++{
++    static_assert(std::is_same_v<T, int8_t> || std::is_same_v<T, int16_t>);
++    const int exponent = tensor->exponent.get();
++    const double quant_scale = std::ldexp(1.0, -exponent);
++    const long long quantized_three = std::llround(3.0 * quant_scale);
++    const long long quantized_two = std::llround(2.0 * quant_scale);
++    const double value_three = std::ldexp(static_cast<double>(quantized_three), exponent);
++    const double value_two = std::ldexp(static_cast<double>(quantized_two), exponent);
++
++    if (std::abs(value_three - 3.0) > 1e-9 || std::abs(value_two - 2.0) > 1e-9 ||
++        quantized_two < std::numeric_limits<T>::min() || quantized_two > std::numeric_limits<T>::max()) {
++        return false;
++    }
++
++    T *value = tensor->get_element_ptr<T>();
++    if (*value != static_cast<T>(quantized_three) && *value != static_cast<T>(quantized_two)) {
++        return false;
++    }
++    *value = static_cast<T>(quantized_two);
++    return true;
++}
++
++bool rewrite_divisor_to_two(TensorBase *tensor)
++{
++    if (tensor == nullptr || tensor->get_size() != 1 || tensor->exponent.is_per_channel()) {
++        return false;
++    }
++    if (tensor->get_dtype() == DATA_TYPE_INT8) {
++        return rewrite_divisor<int8_t>(tensor);
++    }
++    if (tensor->get_dtype() == DATA_TYPE_INT16) {
++        return rewrite_divisor<int16_t>(tensor);
++    }
++    if (tensor->get_dtype() == DATA_TYPE_FLOAT) {
++        float *value = tensor->get_element_ptr<float>();
++        if (std::abs(*value - 3.0f) > 1e-6f && std::abs(*value - 2.0f) > 1e-6f) {
++            return false;
++        }
++        *value = 2.0f;
++        return true;
++    }
++    return false;
++}
++
++#if defined(INFLECT_RUNTIME_DIV2_REQUANT)
++bool requantize_divide_by_two(TensorBase *output, TensorBase *input, runtime_mode_t mode)
++{
++    if (output == nullptr || input == nullptr || output->get_size() != input->get_size() ||
++        output->exponent.is_per_channel() || input->exponent.is_per_channel() ||
++        (reinterpret_cast<uintptr_t>(output->get_element_ptr()) & 0xf) != 0 ||
++        (reinterpret_cast<uintptr_t>(input->get_element_ptr()) & 0xf) != 0) {
++        return false;
++    }
++
++    std::vector<base::requantizeArgsType> args = base::get_requantize_operation_args(output, input, mode);
++    if (args.size() != 1) {
++        return false;
++    }
++
++    const int effective_shift = output->exponent.get() - input->exponent.get() + 1;
++    if (effective_shift < -14 || effective_shift > 31) {
++        return false;
++    }
++    if (effective_shift < 0) {
++        args[0].output_scale = 1 << (-effective_shift);
++        args[0].output_shift = 0;
++    } else {
++        args[0].output_scale = -1;
++        args[0].output_shift = effective_shift;
++    }
++
++    if (output->get_dtype() == DATA_TYPE_INT8 && input->get_dtype() == DATA_TYPE_INT8) {
++        base::requantize_linear<int8_t, int8_t>(&args[0]);
++    } else if (output->get_dtype() == DATA_TYPE_INT8 && input->get_dtype() == DATA_TYPE_INT16) {
++        base::requantize_linear<int8_t, int16_t>(&args[0]);
++    } else if (output->get_dtype() == DATA_TYPE_INT16 && input->get_dtype() == DATA_TYPE_INT16) {
++        base::requantize_linear<int16_t, int16_t>(&args[0]);
++    } else if (output->get_dtype() == DATA_TYPE_INT16 && input->get_dtype() == DATA_TYPE_INT8) {
++        base::requantize_linear<int16_t, int8_t>(&args[0]);
++    } else {
++        return false;
++    }
++    return true;
++}
++#endif
++
++} // namespace
++#endif
++
+ Model::Model(const char *rodata_address_or_partition_label_or_path,
+              fbs::model_location_type_t location,
+              int max_internal_size,
+@@ -142,6 +318,9 @@ esp_err_t Model::load(fbs::FbsModel *fbs_model)
+ 
+     // Construct the execution plan.
+     m_execution_plan.clear();
++#if defined(INFLECT_RUNTIME_PRUNE_K3)
++    m_execution_names.clear();
++#endif
+     dl::module::ModuleCreator *module_creator = dl::module::ModuleCreator::get_instance();
+     m_model_context->clear();
+     std::vector<std::string> op_inputs;
+@@ -165,6 +344,9 @@ esp_err_t Model::load(fbs::FbsModel *fbs_model)
+             break;
+         }
+         m_execution_plan.push_back(module);
++#if defined(INFLECT_RUNTIME_PRUNE_K3)
++        m_execution_names.push_back(node_name);
++#endif
+ 
+         // Add inputs and outputs
+         m_fbs_model->get_operation_inputs_and_outputs(node_name, op_inputs, op_outputs);
+@@ -186,9 +368,297 @@ esp_err_t Model::load(fbs::FbsModel *fbs_model)
+         }
+     }
+ 
++#if defined(INFLECT_RUNTIME_PRUNE_K3)
++    configure_runtime_k3_pruning();
++#endif
++
+     return ret;
+ }
+ 
++#if defined(INFLECT_RUNTIME_PRUNE_K3)
++void Model::configure_runtime_k3_pruning()
++{
++    const std::string subgraph = m_fbs_model->get_model_metadata_prop("subgraph");
++    if (!subgraph.starts_with("decoder.")) {
++        return;
++    }
++
++    int skipped_modules = 0;
++    int merge_modules = 0;
++    int div_modules = 0;
++#if defined(INFLECT_RUNTIME_PRUNE_K7_TAIL)
++    int skipped_k7_tail_modules = 0;
++    int k7_tail_merge_modules = 0;
++#if defined(INFLECT_RUNTIME_PRUNE_K7_SECOND)
++    int skipped_k7_second_modules = 0;
++    int k7_second_merge_modules = 0;
++#endif
++#endif
++    assert(m_execution_names.size() == m_execution_plan.size());
++    for (size_t i = 0; i < m_execution_plan.size(); ++i) {
++        dl::module::Module *module = m_execution_plan[i];
++        const char *name = m_execution_names[i].c_str();
++        if (is_k3_module(name)) {
++            ++skipped_modules;
++        } else if (is_first_stage_merge(name)) {
++            ++merge_modules;
++        } else if (is_stage_div(name)) {
++            ++div_modules;
++            assert(module->m_inputs_index.size() == 2);
++            TensorBase *divisor = m_model_context->get_tensor(module->m_inputs_index[1]);
++            if (!m_fbs_model->m_param_copy || !rewrite_divisor_to_two(divisor)) {
++                ESP_LOGE(TAG, "Cannot rewrite %s divisor from 3 to 2", name);
++                assert(false);
++            }
++        }
++#if defined(INFLECT_RUNTIME_PRUNE_K7_TAIL)
++        if (is_k7_tail_module(name)) {
++            ++skipped_k7_tail_modules;
++        } else if (is_k7_tail_merge(name)) {
++            ++k7_tail_merge_modules;
++            assert(module->m_inputs_index.size() == 2);
++            assert(module->m_outputs_index.size() == 1);
++            assert(module->m_inputs_index[0] != module->m_inputs_index[1]);
++        }
++#if defined(INFLECT_RUNTIME_PRUNE_K7_SECOND)
++        if (is_k7_second_module(name)) {
++            ++skipped_k7_second_modules;
++        } else if (is_k7_second_merge(name)) {
++            ++k7_second_merge_modules;
++            assert(module->m_inputs_index.size() == 2);
++            assert(module->m_outputs_index.size() == 1);
++            assert(module->m_inputs_index[0] != module->m_inputs_index[1]);
++        }
++#endif
++#endif
++    }
++
++    if (skipped_modules != 60 || merge_modules != 4 || div_modules != 4) {
++        ESP_LOGE(TAG,
++                 "Unexpected decoder topology for k3 pruning: skip=%d merge=%d div=%d",
++                 skipped_modules,
++                 merge_modules,
++                 div_modules);
++        assert(false);
++    }
++    m_runtime_prune_k3 = true;
++    ESP_LOGI(TAG,
++             "Enabled same-package k3 pruning for %s: skip=%d merge=%d div=%d",
++             subgraph.c_str(),
++             skipped_modules,
++             merge_modules,
++             div_modules);
++#if defined(INFLECT_RUNTIME_PRUNE_K7_TAIL)
++    if (skipped_k7_tail_modules != 16 || k7_tail_merge_modules != 4) {
++        ESP_LOGE(TAG,
++                 "Unexpected decoder topology for k7 tail pruning: skip=%d merge=%d",
++                 skipped_k7_tail_modules,
++                 k7_tail_merge_modules);
++        assert(false);
++    }
++    ESP_LOGI(TAG,
++             "Enabled same-package k7 tail pruning for %s: skip=%d merge=%d",
++             subgraph.c_str(),
++             skipped_k7_tail_modules,
++             k7_tail_merge_modules);
++#if defined(INFLECT_RUNTIME_PRUNE_K7_SECOND)
++    if (skipped_k7_second_modules != 16 || k7_second_merge_modules != 4) {
++        ESP_LOGE(TAG,
++                 "Unexpected decoder topology for k7 second pruning: skip=%d merge=%d",
++                 skipped_k7_second_modules,
++                 k7_second_merge_modules);
++        assert(false);
++    }
++    ESP_LOGI(TAG,
++             "Enabled same-package k7 second pruning for %s: skip=%d merge=%d",
++             subgraph.c_str(),
++             skipped_k7_second_modules,
++             k7_second_merge_modules);
++#endif
++#endif
++}
++#endif
++
++#if defined(INFLECT_RUNTIME_COPY_K3_MERGES)
++void Model::configure_runtime_k3_merge_copy()
++{
++    const std::string subgraph = m_fbs_model->get_model_metadata_prop("subgraph");
++    if (!subgraph.starts_with("decoder.")) {
++        return;
++    }
++
++    int merge_modules = 0;
++    assert(m_execution_names.size() == m_execution_plan.size());
++    for (size_t i = 0; i < m_execution_plan.size(); ++i) {
++        const char *name = m_execution_names[i].c_str();
++        if (!is_first_stage_merge(name)) {
++            continue;
++        }
++
++        dl::module::Module *module = m_execution_plan[i];
++        assert(module->m_inputs_index.size() == 2);
++        assert(module->m_outputs_index.size() == 1);
++        TensorBase *removed = m_model_context->get_tensor(module->m_inputs_index[0]);
++        TensorBase *retained = m_model_context->get_tensor(module->m_inputs_index[1]);
++        TensorBase *output = m_model_context->get_tensor(module->m_outputs_index[0]);
++        if (removed == nullptr || retained == nullptr || output == nullptr || removed->get_element_ptr() == nullptr ||
++            retained->get_element_ptr() == nullptr || output->get_element_ptr() == nullptr) {
++            ESP_LOGE(TAG, "Missing tensor storage for pruned k3 merge %s", name);
++            assert(false);
++            return;
++        }
++        const uintptr_t output_begin = reinterpret_cast<uintptr_t>(output->get_element_ptr());
++        const uintptr_t retained_begin = reinterpret_cast<uintptr_t>(retained->get_element_ptr());
++        const uintptr_t output_end = output_begin + output->get_bytes();
++        const uintptr_t retained_end = retained_begin + retained->get_bytes();
++        const bool non_overlapping = output_end <= retained_begin || retained_end <= output_begin;
++        const bool valid = output->get_element_ptr() == removed->get_element_ptr() && non_overlapping &&
++            removed->get_size() == output->get_size() && removed->get_bytes() == output->get_bytes() &&
++            removed->get_dtype() == output->get_dtype() && removed->get_exponent() == output->get_exponent() &&
++            removed->get_shape() == output->get_shape() && retained->get_size() == output->get_size() &&
++            retained->get_bytes() == output->get_bytes() && retained->get_dtype() == output->get_dtype() &&
++            retained->get_exponent() == output->get_exponent() && retained->get_shape() == output->get_shape();
++        if (!valid) {
++            ESP_LOGE(TAG, "Cannot replace pruned k3 merge %s with direct copy", name);
++            assert(false);
++            return;
++        }
++        ++merge_modules;
++    }
++
++    if (merge_modules != 4) {
++        ESP_LOGE(TAG, "Unexpected decoder topology for k3 merge copy: merge=%d", merge_modules);
++        assert(false);
++        return;
++    }
++    m_runtime_copy_k3_merges = true;
++    ESP_LOGI(TAG, "Enabled direct P4 copy for pruned k3 merges in %s: merge=%d", subgraph.c_str(), merge_modules);
++}
++#endif
++
++#if defined(INFLECT_RUNTIME_BYPASS_K7_MERGES)
++void Model::configure_runtime_k7_merge_bypass()
++{
++    const std::string subgraph = m_fbs_model->get_model_metadata_prop("subgraph");
++    if (!subgraph.starts_with("decoder.")) {
++        return;
++    }
++
++    int merge_modules = 0;
++    assert(m_execution_names.size() == m_execution_plan.size());
++    for (size_t i = 0; i < m_execution_plan.size(); ++i) {
++        const char *name = m_execution_names[i].c_str();
++        if (!is_pruned_k7_merge(name)) {
++            continue;
++        }
++
++        dl::module::Module *module = m_execution_plan[i];
++        assert(module->m_inputs_index.size() == 2);
++        assert(module->m_outputs_index.size() == 1);
++        TensorBase *identity = m_model_context->get_tensor(module->m_inputs_index[0]);
++        TensorBase *residual = m_model_context->get_tensor(module->m_inputs_index[1]);
++        TensorBase *output = m_model_context->get_tensor(module->m_outputs_index[0]);
++        const bool valid = identity != nullptr && residual != nullptr && output != nullptr &&
++            identity->get_element_ptr() != nullptr && residual->get_element_ptr() != nullptr &&
++            output->get_element_ptr() == identity->get_element_ptr() &&
++            residual->get_element_ptr() != identity->get_element_ptr() && identity->get_size() == output->get_size() &&
++            identity->get_bytes() == output->get_bytes() && identity->get_dtype() == output->get_dtype() &&
++            identity->get_exponent() == output->get_exponent() && identity->get_shape() == output->get_shape();
++        if (!valid) {
++            ESP_LOGE(TAG, "Cannot exactly bypass zero-residual merge %s", name);
++            assert(false);
++        }
++        ++merge_modules;
++    }
++
++    if (merge_modules != 8) {
++        ESP_LOGE(TAG, "Unexpected decoder topology for k7 merge bypass: merge=%d", merge_modules);
++        assert(false);
++    }
++    m_runtime_bypass_k7_merges = true;
++    ESP_LOGI(TAG, "Enabled exact in-place k7 merge bypass for %s: merge=%d", subgraph.c_str(), merge_modules);
++}
++#endif
++
++bool Model::forward_module(size_t execution_index, runtime_mode_t mode)
++{
++    dl::module::Module *module = m_execution_plan[execution_index];
++#if defined(INFLECT_RUNTIME_PRUNE_K3)
++    if (m_runtime_prune_k3) {
++        const char *name = m_execution_names[execution_index].c_str();
++#if defined(INFLECT_RUNTIME_COPY_K3_MERGES)
++        if (m_runtime_copy_k3_merges && is_first_stage_merge(name)) {
++            TensorBase *retained = m_model_context->get_tensor(module->m_inputs_index[1]);
++            TensorBase *output = m_model_context->get_tensor(module->m_outputs_index[0]);
++            tool::copy_memory(output->get_element_ptr(), retained->get_element_ptr(), output->get_bytes());
++            return true;
++        }
++#endif
++#if defined(INFLECT_RUNTIME_BYPASS_K7_MERGES)
++        if (m_runtime_bypass_k7_merges && is_pruned_k7_merge(name)) {
++            return true;
++        }
++#endif
++        if (is_k3_module(name)) {
++            return false;
++        }
++        if (is_first_stage_merge(name)) {
++            assert(module->m_inputs_index.size() == 2);
++            TensorBase *skipped_output = m_model_context->get_tensor(module->m_inputs_index[0]);
++            assert(skipped_output != nullptr);
++            tool::set_zero(skipped_output->get_element_ptr(), skipped_output->get_bytes());
++        }
++#if defined(INFLECT_RUNTIME_PRUNE_K7_TAIL)
++        if (is_k7_tail_module(name)) {
++            return false;
++        }
++        if (is_k7_tail_merge(name)) {
++            assert(module->m_inputs_index.size() == 2);
++            TensorBase *identity = m_model_context->get_tensor(module->m_inputs_index[0]);
++            TensorBase *skipped_residual = m_model_context->get_tensor(module->m_inputs_index[1]);
++            assert(identity != nullptr);
++            assert(skipped_residual != nullptr);
++            assert(identity->get_size() == skipped_residual->get_size());
++            assert(identity->get_dtype() == skipped_residual->get_dtype());
++            assert(identity->get_element_ptr() != skipped_residual->get_element_ptr());
++            tool::set_zero(skipped_residual->get_element_ptr(), skipped_residual->get_bytes());
++        }
++#if defined(INFLECT_RUNTIME_PRUNE_K7_SECOND)
++        if (is_k7_second_module(name)) {
++            return false;
++        }
++        if (is_k7_second_merge(name)) {
++            assert(module->m_inputs_index.size() == 2);
++            TensorBase *identity = m_model_context->get_tensor(module->m_inputs_index[0]);
++            TensorBase *skipped_residual = m_model_context->get_tensor(module->m_inputs_index[1]);
++            assert(identity != nullptr);
++            assert(skipped_residual != nullptr);
++            assert(identity->get_size() == skipped_residual->get_size());
++            assert(identity->get_dtype() == skipped_residual->get_dtype());
++            assert(identity->get_element_ptr() != skipped_residual->get_element_ptr());
++            tool::set_zero(skipped_residual->get_element_ptr(), skipped_residual->get_bytes());
++        }
++#endif
++#endif
++#if defined(INFLECT_RUNTIME_DIV2_REQUANT)
++        if (is_stage_div(name)) {
++            assert(module->m_inputs_index.size() == 2);
++            assert(module->m_outputs_index.size() == 1);
++            TensorBase *input = m_model_context->get_tensor(module->m_inputs_index[0]);
++            TensorBase *output = m_model_context->get_tensor(module->m_outputs_index[0]);
++            if (!requantize_divide_by_two(output, input, mode)) {
++                ESP_LOGE(TAG, "Cannot replace %s with divide-by-two requantization", name);
++                assert(false);
++            }
++            return true;
++        }
++#endif
++    }
++#endif
++    module->forward(m_model_context, mode);
++    return true;
++}
++
+ void Model::build(size_t max_internal_size,
+                   memory_manager_t mm_type,
+                   bool preload,
+@@ -205,6 +675,12 @@ void Model::build(size_t max_internal_size,
+         memory_manager = new MemoryManagerGreedy(max_internal_size);
+     }
+     memory_manager->alloc(m_fbs_model, m_execution_plan, m_model_context, input_shapes);
++#if defined(INFLECT_RUNTIME_COPY_K3_MERGES)
++    configure_runtime_k3_merge_copy();
++#endif
++#if defined(INFLECT_RUNTIME_BYPASS_K7_MERGES)
++    configure_runtime_k7_merge_bypass();
++#endif
+ 
+     // get the TensorBase* of inputs and outputs
+     std::vector<std::string> inputs_tmp = m_fbs_model->get_graph_inputs();
+@@ -230,7 +706,7 @@ void Model::run(runtime_mode_t mode)
+     for (int i = 0; i < m_execution_plan.size(); i++) {
+         dl::module::Module *module = m_execution_plan[i];
+         if (module) {
+-            module->forward(m_model_context, mode);
++            forward_module(i, mode);
+         } else {
+             break;
+         }
+@@ -254,8 +730,7 @@ void Model::run(int stage_num, int stage_index, runtime_mode_t mode)
+ 
+     // execute each module of the current stage.
+     for (int i = start; i < end; i++) {
+-        dl::module::Module *module = m_execution_plan[i];
+-        module->forward(m_model_context, mode);
++        forward_module(i, mode);
+     }
+ }
+ 
+@@ -308,7 +783,7 @@ void Model::run(std::map<std::string, TensorBase *> &user_inputs,
+     for (int i = 0; i < m_execution_plan.size(); i++) {
+         dl::module::Module *module = m_execution_plan[i];
+         if (module) {
+-            module->forward(m_model_context, mode);
++            forward_module(i, mode);
+             // get the intermediate tensor for debug.
+             if (!user_outputs.empty()) {
+                 for (auto user_outputs_iter = user_outputs.begin(); user_outputs_iter != user_outputs.end();
+@@ -477,7 +952,7 @@ esp_err_t Model::test()
+     }
+     for (int i = 0; i < m_execution_plan.size(); i++) {
+         dl::module::Module *module = m_execution_plan[i];
+-        module->forward(m_model_context, RUNTIME_MODE_SINGLE_CORE);
++        forward_module(i, RUNTIME_MODE_SINGLE_CORE);
+         std::vector<int> module_outputs_index = module->get_outputs_index();
+         for (int index : module_outputs_index) {
+             auto iter = std::find(test_outputs_index.begin(), test_outputs_index.end(), index);
+@@ -550,7 +1025,7 @@ std::map<std::string, mem_info_t> Model::get_memory_info()
+     return info;
+ }
+ 
+-std::map<std::string, module_info> Model::get_module_info()
++std::map<std::string, module_info> Model::get_module_info(runtime_mode_t mode)
+ {
+     std::map<std::string, module_info> module_info;
+     std::vector<std::string> sorted_nodes = m_fbs_model->topological_sort();
+@@ -562,7 +1037,7 @@ std::map<std::string, module_info> Model::get_module_info()
+         std::string module_name = sorted_nodes[i];
+         std::string module_type = m_fbs_model->get_operation_type(module_name);
+         DL_LOG_LATENCY_START();
+-        m_execution_plan[i]->forward(m_model_context, RUNTIME_MODE_SINGLE_CORE);
++        forward_module(i, mode);
+         DL_LOG_LATENCY_END();
+         uint32_t module_latency = DL_LOG_LATENCY_GET();
+         total_latency += module_latency;
+diff --git a/dl/module/include/dl_module_lut.hpp b/dl/module/include/dl_module_lut.hpp
+index a72fadd..fbfd872 100644
+--- a/dl/module/include/dl_module_lut.hpp
++++ b/dl/module/include/dl_module_lut.hpp
+@@ -14,8 +14,49 @@ namespace module {
+  */
+ class LUT : public Module {
+ private:
++    struct LutArgs {
++        void *output;
++        const void *input;
++        int32_t size;
++        const void *table;
++        int32_t step;
++        base::lut_s8_formula_t formula;
++    };
++
+     TensorBase *table; /*LUT loop up table*/
+     int step;          /*LUT loop up table step: only available for int16.*/
++    base::lut_s8_formula_t formula;
++
++    void run_args(const LutArgs &args)
++    {
++        if (quant_type == QUANT_TYPE_SYMM_8BIT) {
++            if (args.formula != base::LUT_S8_FORMULA_NONE) {
++                base::lut_s8_formula(static_cast<int8_t *>(args.output),
++                                     static_cast<const int8_t *>(args.input),
++                                     args.size,
++                                     args.formula);
++            } else {
++                base::lut_s8(static_cast<int8_t *>(args.output),
++                             static_cast<const int8_t *>(args.input),
++                             args.size,
++                             static_cast<const int8_t *>(args.table));
++            }
++        } else if (args.step > 1) {
++            base::lut_s16_nearest_neighbor(static_cast<int16_t *>(args.output),
++                                           static_cast<const int16_t *>(args.input),
++                                           args.size,
++                                           static_cast<const int16_t *>(args.table),
++                                           args.step);
++        } else {
++            auto *output = static_cast<int16_t *>(args.output);
++            const auto *input = static_cast<const int16_t *>(args.input);
++            const auto *lookup = static_cast<const int16_t *>(args.table);
++            for (int32_t i = 0; i < args.size; ++i) {
++                output[i] = lookup[input[i] + 32768];
++            }
++        }
++    }
++
+ public:
+     /**
+      * @brief Construct a new LUT object.
+@@ -31,6 +72,11 @@ public:
+     {
+         this->table = table;
+         this->step = 1;
++        this->formula = base::LUT_S8_FORMULA_NONE;
++        if (quant_type == QUANT_TYPE_SYMM_8BIT && table != nullptr && table->get_size() == 256) {
++            this->formula =
++                base::classify_lut_s8_formula(static_cast<const int8_t *>(table->get_element_ptr()));
++        }
+         if (quant_type == QUANT_TYPE_SYMM_16BIT) {
+             this->step = 65536 / (this->table->get_size() - 1);
+         }
+@@ -53,29 +99,35 @@ public:
+         TensorBase *output = context->get_tensor(m_outputs_index[0]);
+         assert(output->exponent == this->table->exponent);
+ 
+-        if (quant_type == QUANT_TYPE_SYMM_8BIT) {
+-            base::lut_s8((int8_t *)output->get_element_ptr(),
+-                         (int8_t *)input->get_element_ptr(),
+-                         input->size,
+-                         (int8_t *)this->table->get_element_ptr());
+-        } else if (quant_type == QUANT_TYPE_SYMM_16BIT) {
+-            int16_t *input_ptr = (int16_t *)input->get_element_ptr();
+-            int16_t *output_ptr = (int16_t *)output->get_element_ptr();
+-            int16_t *table_ptr = (int16_t *)(this->table->get_element_ptr());
+-
+-            if (this->step > 1) {
+-                assert((this->step & (this->step - 1)) == 0);
+-                base::lut_s16_nearest_neighbor(output_ptr, input_ptr, input->size, table_ptr, this->step);
+-
+-            } else {
+-                for (size_t i = 0; i < input->size; i++) {
+-                    output_ptr[i] = table_ptr[input_ptr[i] + 32768];
+-                }
+-            }
++        const int32_t element_count = static_cast<int32_t>(input->size);
++        const int32_t alignment = quant_type == QUANT_TYPE_SYMM_8BIT ? 16 : 8;
++        const int32_t first_count = (element_count / 2) & ~(alignment - 1);
++        const size_t element_size = quant_type == QUANT_TYPE_SYMM_8BIT
++            ? sizeof(int8_t)
++            : sizeof(int16_t);
++        LutArgs args[2] = {
++            {output->get_element_ptr(),
++             input->get_element_ptr(),
++             first_count,
++             this->table->get_element_ptr(),
++             this->step,
++             this->formula},
++            {static_cast<uint8_t *>(output->get_element_ptr()) + first_count * element_size,
++             static_cast<const uint8_t *>(input->get_element_ptr()) + first_count * element_size,
++             element_count - first_count,
++             this->table->get_element_ptr(),
++             this->step,
++             this->formula},
++        };
++        if (mode == RUNTIME_MODE_MULTI_CORE && element_count >= 4096 && first_count > 0) {
++            module_forward_dual_core(this, &args[0], &args[1]);
++        } else {
++            args[0].size = element_count;
++            run_args(args[0]);
+         }
+     }
+ 
+-    void forward_args(void *args) {}
++    void forward_args(void *args) { run_args(*static_cast<LutArgs *>(args)); }
+ 
+     /**
+      * @brief deserialize LUT module instance by node serialization information
+diff --git a/dl/module/include/dl_module_requantize_linear.hpp b/dl/module/include/dl_module_requantize_linear.hpp
+index 72a03a8..35c4fef 100644
+--- a/dl/module/include/dl_module_requantize_linear.hpp
++++ b/dl/module/include/dl_module_requantize_linear.hpp
+@@ -36,7 +36,37 @@ public:
+         TensorBase *input = context->get_tensor(m_inputs_index[0]);
+         TensorBase *output = context->get_tensor(m_outputs_index[0]);
+         assert(input->get_size() == output->get_size());
+-        output->assign(input);
++
++        if (input->get_dtype() == DATA_TYPE_INT8 &&
++            output->get_dtype() == DATA_TYPE_INT8 &&
++            !input->exponent.is_per_channel() &&
++            !output->exponent.is_per_channel()) {
++            const int shift = output->get_exponent() - input->get_exponent();
++            if (shift >= -1) {
++                output->assign(input);
++                return;
++            }
++            const auto *source = static_cast<const int8_t *>(input->get_element_ptr());
++            auto *destination = static_cast<int8_t *>(output->get_element_ptr());
++            const int left_shift = -shift;
++            if (left_shift >= 8) {
++                for (int index = 0; index < output->get_size(); ++index) {
++                    destination[index] = source[index] > 0 ? DL_QUANT8_MAX
++                        : source[index] < 0                  ? DL_QUANT8_MIN
++                                                           : 0;
++                }
++                return;
++            }
++            const int32_t scale = 1 << left_shift;
++            for (int index = 0; index < output->get_size(); ++index) {
++                const int32_t shifted =
++                    static_cast<int32_t>(source[index]) * scale;
++                destination[index] = static_cast<int8_t>(
++                    DL_CLIP(shifted, DL_QUANT8_MIN, DL_QUANT8_MAX));
++            }
++        } else {
++            output->assign(input);
++        }
+     }
+ 
+     void forward_args(void *args) {}
+diff --git a/dl/module/include/dl_module_transpose.hpp b/dl/module/include/dl_module_transpose.hpp
+index 8352658..689e26d 100644
+--- a/dl/module/include/dl_module_transpose.hpp
++++ b/dl/module/include/dl_module_transpose.hpp
+@@ -2,6 +2,7 @@
+ 
+ #include "dl_base_mul2d.hpp"
+ #include "dl_module_base.hpp"
++#include <cstring>
+ 
+ namespace dl {
+ namespace module {
+@@ -14,6 +15,96 @@ class Transpose : public Module {
+ private:
+     std::vector<int> m_perm; /*!< A list of integers. Its length must be equal to the rank of the input. */
+ 
++    struct MoveAxisOneArgs {
++        const uint8_t *input;
++        uint8_t *output;
++        size_t element_bytes;
++        size_t axis_one;
++        size_t trailing;
++        size_t row_begin;
++        size_t row_end;
++    };
++
++    static bool moves_axis_one_to_last(const std::vector<int> &perm)
++    {
++        if (perm.size() < 3 || perm[0] != 0 || perm.back() != 1) {
++            return false;
++        }
++        for (size_t index = 1; index + 1 < perm.size(); ++index) {
++            if (perm[index] != static_cast<int>(index + 1)) {
++                return false;
++            }
++        }
++        return true;
++    }
++
++    static void move_axis_one_to_last(const MoveAxisOneArgs &args)
++    {
++        if (args.element_bytes == 1) {
++            move_axis_one_to_last_tiled<uint8_t>(args);
++            return;
++        }
++        if (args.element_bytes == 2) {
++            move_axis_one_to_last_tiled<uint16_t>(args);
++            return;
++        }
++
++        const size_t rows_per_batch = args.trailing;
++        const size_t elements_per_batch = args.axis_one * rows_per_batch;
++        for (size_t row = args.row_begin; row < args.row_end; ++row) {
++            const size_t batch = row / rows_per_batch;
++            const size_t trailing_index = row - batch * rows_per_batch;
++            const size_t output_base = row * args.axis_one;
++            const size_t input_batch_base = batch * elements_per_batch;
++            for (size_t axis_index = 0; axis_index < args.axis_one; ++axis_index) {
++                std::memcpy(
++                    args.output + (output_base + axis_index) * args.element_bytes,
++                    args.input +
++                        (input_batch_base + axis_index * rows_per_batch + trailing_index) * args.element_bytes,
++                    args.element_bytes);
++            }
++        }
++    }
++
++    template <typename T>
++    static void move_axis_one_to_last_tiled(const MoveAxisOneArgs &args)
++    {
++        constexpr size_t kTileRows = 16;
++        constexpr size_t kTileAxis = 16;
++        T tile[kTileAxis][kTileRows];
++        const auto *input = reinterpret_cast<const T *>(args.input);
++        auto *output = reinterpret_cast<T *>(args.output);
++        const size_t elements_per_batch = args.axis_one * args.trailing;
++
++        size_t row = args.row_begin;
++        while (row < args.row_end) {
++            const size_t batch = row / args.trailing;
++            const size_t trailing_index = row - batch * args.trailing;
++            const size_t rows_in_batch = args.trailing - trailing_index;
++            const size_t rows_remaining = args.row_end - row;
++            const size_t row_count = rows_in_batch < rows_remaining ? rows_in_batch : rows_remaining;
++            const size_t tile_rows = row_count < kTileRows ? row_count : kTileRows;
++            const size_t input_batch_base = batch * elements_per_batch;
++
++            for (size_t axis_begin = 0; axis_begin < args.axis_one; axis_begin += kTileAxis) {
++                const size_t axis_remaining = args.axis_one - axis_begin;
++                const size_t tile_axis = axis_remaining < kTileAxis ? axis_remaining : kTileAxis;
++                for (size_t axis = 0; axis < tile_axis; ++axis) {
++                    std::memcpy(tile[axis],
++                                input + input_batch_base + (axis_begin + axis) * args.trailing + trailing_index,
++                                tile_rows * sizeof(T));
++                }
++                for (size_t tile_row = 0; tile_row < tile_rows; ++tile_row) {
++                    T *destination = output + (row + tile_row) * args.axis_one + axis_begin;
++                    for (size_t axis = 0; axis < tile_axis; ++axis) {
++                        destination[axis] = tile[axis][tile_row];
++                    }
++                }
++            }
++            row += tile_rows;
++        }
++    }
++
+ public:
+     /**
+      * @brief Construct a new Transpose object.
+@@ -55,10 +146,42 @@ public:
+     {
+         TensorBase *input = context->get_tensor(m_inputs_index[0]);
+         TensorBase *output = context->get_tensor(m_outputs_index[0]);
++        const auto &shape = input->get_shape();
++        if (moves_axis_one_to_last(m_perm) && shape.size() == m_perm.size()) {
++            size_t trailing = 1;
++            for (size_t index = 2; index < shape.size(); ++index) {
++                trailing *= static_cast<size_t>(shape[index]);
++            }
++            const size_t rows = static_cast<size_t>(shape[0]) * trailing;
++            MoveAxisOneArgs args[2] = {
++                {
++                    static_cast<const uint8_t *>(input->get_element_ptr()),
++                    static_cast<uint8_t *>(output->get_element_ptr()),
++                    static_cast<size_t>(input->get_bytes()) / static_cast<size_t>(input->get_size()),
++                    static_cast<size_t>(shape[1]),
++                    trailing,
++                    0,
++                    rows,
++                },
++                {},
++            };
++            const bool dual_core = mode == RUNTIME_MODE_MULTI_CORE ||
++                (mode == RUNTIME_MODE_AUTO && input->get_bytes() >= 32768);
++            if (dual_core && rows >= 2) {
++                args[0].row_end = rows / 2;
++                args[1] = args[0];
++                args[1].row_begin = rows / 2;
++                args[1].row_end = rows;
++                module_forward_dual_core(this, &args[0], &args[1]);
++            } else {
++                forward_args(&args[0]);
++            }
++            return;
++        }
+         output->transpose(input, m_perm);
+     }
+ 
+-    void forward_args(void *args) {}
++    void forward_args(void *args) { move_axis_one_to_last(*static_cast<MoveAxisOneArgs *>(args)); }
+ 
+     /**
+      * @brief deserialize Transpose module instance by node serialization information

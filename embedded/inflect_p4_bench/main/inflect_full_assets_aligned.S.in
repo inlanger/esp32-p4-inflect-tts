@@ -1,0 +1,25 @@
+.section .rodata.embedded,"a",@progbits
+.balign 4
+
+.global inflect_full_assets_bin
+.global _binary_inflect_full_assets_bin_start
+inflect_full_assets_bin:
+_binary_inflect_full_assets_bin_start:
+.incbin "@INFLECT_ASSETS_BIN@"
+
+.global inflect_full_assets_bin_length
+.global _binary_inflect_full_assets_bin_end
+inflect_full_assets_bin_length:
+_binary_inflect_full_assets_bin_end:
+
+.if @INFLECT_ESPDL_TEXT_PAD_BYTES@ > 0
+.pushsection .text.inflect_espdl_layout_pad,"ax",@progbits
+.balign 2
+.global inflect_espdl_layout_pad
+inflect_espdl_layout_pad:
+.space @INFLECT_ESPDL_TEXT_PAD_BYTES@
+.popsection
+
+# Keep the unexecuted text section without adding executable reference code.
+.word inflect_espdl_layout_pad
+.endif
