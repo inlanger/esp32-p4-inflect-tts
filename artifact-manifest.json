@@ -1,7 +1,9 @@
 {
   "schema_version": 1,
-  "publication_commit": "336e7670a4e6a540d8841df35f8d9b3da3fae23f",
+  "paper_snapshot_commit": "336e7670a4e6a540d8841df35f8d9b3da3fae23f",
+  "runtime_release_commit": "f5701f9f92e92522086233d6c10879c07740b10f",
   "runtime_source_commit": "f14bf17d91eb5835dee93e8dc6f5b80ef8b57a09",
+  "model_distribution": "https://huggingface.co/inlanger/inflect-nano-v2-esp32p4-espdl",
   "upstream_model": {
     "repository": "owensong/Inflect-Nano-v2",
     "revision": "1cbf8079a95a87e013999321fb79fda8b9025238",
@@ -37,6 +39,11 @@
       "path": "evidence/ready-flow48/ready-flow48.json",
       "bytes": 2351,
       "sha256": "17e17cb633b26863ae7c990cae0e0529f4fcec9c5917ffdca7eaa8b21500ec31"
+    },
+    {
+      "path": "evidence/decoder-surface/decoder-surface.json",
+      "bytes": 136574,
+      "sha256": "ad3fe556db6ea0ca54115ad7413ff1d7a88d7df18ef0f1c81e26419180c254bb"
     }
   ]
 }

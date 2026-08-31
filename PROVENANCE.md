@@ -39,6 +39,13 @@ for byte from the accepted connected-board gate. The JSON preserves its
 original local output path so its publication SHA remains identical to the
 one printed in the paper.
 
+`evidence/decoder-surface/decoder-surface.json` is the public supplemental
+record for the decoder structure, nominal compute, activation statistics,
+parameter groups, and receptive-field calculations. Only two workstation
+paths were removed from the retained research artifact. Its public SHA-256 is
+`ad3fe556db6ea0ca54115ad7413ff1d7a88d7df18ef0f1c81e26419180c254bb`;
+the original pre-sanitization SHA-256 is retained inside the file.
+
 The original application binary SHA-256 reported by the paper is
 `50462fa0add9f59b68ca9b8e7adc8525e4eb4427d839405694652a101b9d1634`.
 Build paths and ESP-IDF generated metadata can affect a rebuilt application

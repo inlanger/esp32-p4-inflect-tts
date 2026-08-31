@@ -53,7 +53,8 @@ The exact captured result is in `evidence/ready-flow48/`:
 - `tools/build_inflect_p4_release.sh`: board-independent release build.
 - `tools/build_flash_inflect_p4_service.sh`: build and flash helper.
 - `tools/run_inflect_p4_service.py`: raw-text request and verified WAV capture.
-- `evidence/`: retained board output and machine-readable telemetry.
+- `evidence/ready-flow48/`: retained board output and machine-readable telemetry.
+- `evidence/decoder-surface/`: sanitized supplemental decoder analysis.
 - `paper/`: immutable publication snapshot.
 
 Experimental G5-G18 decoders, rejected pruning routes, training corpora, and

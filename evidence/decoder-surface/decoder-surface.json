@@ -1,0 +1,4861 @@
+{
+  "format": "inflect_nano_v2_decoder_surface_v1",
+  "publication": {
+    "source_sha256": "3572eb3b963bdc98c2460957457665f5f538bfb6cd715a5017b67651a12a9b17",
+    "transformation": "Removed two workstation-local paths; numeric evidence and source hashes are unchanged.",
+    "removed_fields": [
+      "source.model_dir",
+      "shape_and_compute.input_source.path"
+    ]
+  },
+  "source": {
+    "model_pth_sha256": "bfca468489c9069361d6b87b295a17eef611af8ff09854ce0b80305d9122f5b3",
+    "config_sha256": "8669007c29a215dfc6c4cbb4962c01440f4d806022584699404aee58e5249f03",
+    "model_repository": "owensong/Inflect-Nano-v2",
+    "model_revision": "1cbf8079a95a87e013999321fb79fda8b9025238"
+  },
+  "release_counts": {
+    "checkpoint_parameters_before_weight_norm_removal": 3966721,
+    "deployed_parameters_after_weight_norm_removal": 3958801,
+    "decoder_parameters_after_weight_norm_removal": 2092368,
+    "decoder_parameter_bytes_fp32": 8369472
+  },
+  "active_graph": {
+    "decoder_class": "Generator",
+    "decoder_alias_free": false,
+    "decoder_alias_free_start_stage": 2,
+    "resblock_type": "1",
+    "latent_channels": 128,
+    "upsample_rates": [
+      8,
+      8,
+      2,
+      2
+    ],
+    "upsample_kernels": [
+      16,
+      16,
+      4,
+      4
+    ],
+    "upsample_initial_channels": 192,
+    "stage_channels": [
+      96,
+      48,
+      24,
+      12
+    ],
+    "resblock_kernels": [
+      3,
+      7,
+      11
+    ],
+    "resblock_dilations": [
+      [
+        1,
+        3,
+        5
+      ],
+      [
+        1,
+        3,
+        5
+      ],
+      [
+        1,
+        3,
+        5
+      ]
+    ],
+    "conv1d_count": 74,
+    "conv_transpose1d_count": 4,
+    "resblock_count": 12,
+    "parallel_branches_per_stage": 3,
+    "inactive_runtime_paths": [
+      "AliasFreeActivation1d",
+      "AliasFreeResBlock1",
+      "SnakeBeta"
+    ]
+  },
+  "shape_and_compute": {
+    "latent_frames": 96,
+    "input_source": {
+      "kind": "golden_flow_z",
+      "sha256": "300579302d5a79334a15adcc325e7c3c38d6791c92c5f0e6b88f85ca0a05f56b",
+      "artifact_id": "inflect-nano-v2-golden.npz"
+    },
+    "input_shape": [
+      1,
+      128,
+      96
+    ],
+    "input_activation": {
+      "elements": 12288,
+      "mean": 0.052689339965581894,
+      "std": 1.687194585800171,
+      "abs_p50": 0.9501609802246094,
+      "abs_p95": 3.467810869216919,
+      "abs_p99": 5.002377033233643,
+      "abs_max": 18.38325309753418,
+      "zero_fraction": 0.0
+    },
+    "output_shape": [
+      1,
+      1,
+      24576
+    ],
+    "output_activation": {
+      "elements": 24576,
+      "mean": -6.258643406908959e-05,
+      "std": 0.05850910022854805,
+      "abs_p50": 0.01778416335582733,
+      "abs_p95": 0.12570610642433167,
+      "abs_p99": 0.20756173133850098,
+      "abs_max": 0.5140538215637207,
+      "zero_fraction": 0.0
+    },
+    "hop_length_samples": 256,
+    "sample_rate_hz": 24000,
+    "audio_seconds": 1.024,
+    "total_macs": 4159143936,
+    "macs_per_second_audio": 4061664000.0,
+    "operations_by_group": {
+      "post": 1,
+      "pre": 1,
+      "stage_0.resblock_k11": 6,
+      "stage_0.resblock_k3": 6,
+      "stage_0.resblock_k7": 6,
+      "stage_0.upsample": 1,
+      "stage_1.resblock_k11": 6,
+      "stage_1.resblock_k3": 6,
+      "stage_1.resblock_k7": 6,
+      "stage_1.upsample": 1,
+      "stage_2.resblock_k11": 6,
+      "stage_2.resblock_k3": 6,
+      "stage_2.resblock_k7": 6,
+      "stage_2.upsample": 1,
+      "stage_3.resblock_k11": 6,
+      "stage_3.resblock_k3": 6,
+      "stage_3.resblock_k7": 6,
+      "stage_3.upsample": 1
+    },
+    "macs_by_group": {
+      "post": 2064384,
+      "pre": 16515072,
+      "stage_0.resblock_k11": 467140608,
+      "stage_0.resblock_k3": 127401984,
+      "stage_0.resblock_k7": 297271296,
+      "stage_0.upsample": 28311552,
+      "stage_1.resblock_k11": 934281216,
+      "stage_1.resblock_k3": 254803968,
+      "stage_1.resblock_k7": 594542592,
+      "stage_1.upsample": 56623104,
+      "stage_2.resblock_k11": 467140608,
+      "stage_2.resblock_k3": 127401984,
+      "stage_2.resblock_k7": 297271296,
+      "stage_2.upsample": 28311552,
+      "stage_3.resblock_k11": 233570304,
+      "stage_3.resblock_k3": 63700992,
+      "stage_3.resblock_k7": 148635648,
+      "stage_3.upsample": 14155776
+    }
+  },
+  "receptive_field": {
+    "maximum_resblock_radius_samples_per_stage": 60,
+    "left_halo_latent_frames": 13,
+    "right_halo_latent_frames": 13,
+    "maximum_latent_span_frames": 27,
+    "halo_each_side_ms": 138.66666666666666
+  },
+  "parameter_groups": {
+    "post": {
+      "parameters": 84,
+      "bytes": 336,
+      "tensors": 1
+    },
+    "pre": {
+      "parameters": 172224,
+      "bytes": 688896,
+      "tensors": 2
+    },
+    "stage_0.resblock_k11": {
+      "parameters": 608832,
+      "bytes": 2435328,
+      "tensors": 12
+    },
+    "stage_0.resblock_k3": {
+      "parameters": 166464,
+      "bytes": 665856,
+      "tensors": 12
+    },
+    "stage_0.resblock_k7": {
+      "parameters": 387648,
+      "bytes": 1550592,
+      "tensors": 12
+    },
+    "stage_0.upsample": {
+      "parameters": 295008,
+      "bytes": 1180032,
+      "tensors": 2
+    },
+    "stage_1.resblock_k11": {
+      "parameters": 152352,
+      "bytes": 609408,
+      "tensors": 12
+    },
+    "stage_1.resblock_k3": {
+      "parameters": 41760,
+      "bytes": 167040,
+      "tensors": 12
+    },
+    "stage_1.resblock_k7": {
+      "parameters": 97056,
+      "bytes": 388224,
+      "tensors": 12
+    },
+    "stage_1.upsample": {
+      "parameters": 73776,
+      "bytes": 295104,
+      "tensors": 2
+    },
+    "stage_2.resblock_k11": {
+      "parameters": 38160,
+      "bytes": 152640,
+      "tensors": 12
+    },
+    "stage_2.resblock_k3": {
+      "parameters": 10512,
+      "bytes": 42048,
+      "tensors": 12
+    },
+    "stage_2.resblock_k7": {
+      "parameters": 24336,
+      "bytes": 97344,
+      "tensors": 12
+    },
+    "stage_2.upsample": {
+      "parameters": 4632,
+      "bytes": 18528,
+      "tensors": 2
+    },
+    "stage_3.resblock_k11": {
+      "parameters": 9576,
+      "bytes": 38304,
+      "tensors": 12
+    },
+    "stage_3.resblock_k3": {
+      "parameters": 2664,
+      "bytes": 10656,
+      "tensors": 12
+    },
+    "stage_3.resblock_k7": {
+      "parameters": 6120,
+      "bytes": 24480,
+      "tensors": 12
+    },
+    "stage_3.upsample": {
+      "parameters": 1164,
+      "bytes": 4656,
+      "tensors": 2
+    }
+  },
+  "quantization_surface": {
+    "highest_per_output_channel_range_layers": [
+      {
+        "name": "resblocks.9.convs1.0",
+        "minimum_channel_abs_max": 0.006872076541185379,
+        "median_channel_abs_max": 0.2772679030895233,
+        "maximum_channel_abs_max": 0.44477272033691406,
+        "max_to_min_nonzero_ratio": 64.72173551492403
+      },
+      {
+        "name": "resblocks.1.convs2.2",
+        "minimum_channel_abs_max": 0.024924742057919502,
+        "median_channel_abs_max": 0.1904662698507309,
+        "maximum_channel_abs_max": 1.0146535634994507,
+        "max_to_min_nonzero_ratio": 40.70868862520718
+      },
+      {
+        "name": "resblocks.1.convs2.1",
+        "minimum_channel_abs_max": 0.021285230293869972,
+        "median_channel_abs_max": 0.1592596024274826,
+        "maximum_channel_abs_max": 0.8067356944084167,
+        "max_to_min_nonzero_ratio": 37.90119642918555
+      },
+      {
+        "name": "resblocks.1.convs2.0",
+        "minimum_channel_abs_max": 0.03235657885670662,
+        "median_channel_abs_max": 0.10662610083818436,
+        "maximum_channel_abs_max": 0.9902668595314026,
+        "max_to_min_nonzero_ratio": 30.604807260893338
+      },
+      {
+        "name": "resblocks.4.convs2.0",
+        "minimum_channel_abs_max": 0.05568240210413933,
+        "median_channel_abs_max": 0.1569250226020813,
+        "maximum_channel_abs_max": 1.44527268409729,
+        "max_to_min_nonzero_ratio": 25.9556454011141
+      },
+      {
+        "name": "resblocks.2.convs2.0",
+        "minimum_channel_abs_max": 0.011120372451841831,
+        "median_channel_abs_max": 0.06956642121076584,
+        "maximum_channel_abs_max": 0.2830498516559601,
+        "max_to_min_nonzero_ratio": 25.453270821795133
+      },
+      {
+        "name": "resblocks.5.convs1.1",
+        "minimum_channel_abs_max": 0.09913338720798492,
+        "median_channel_abs_max": 0.15993310511112213,
+        "maximum_channel_abs_max": 1.848819613456726,
+        "max_to_min_nonzero_ratio": 18.64981784167069
+      },
+      {
+        "name": "resblocks.2.convs2.1",
+        "minimum_channel_abs_max": 0.01550967339426279,
+        "median_channel_abs_max": 0.1060609221458435,
+        "maximum_channel_abs_max": 0.28740790486335754,
+        "max_to_min_nonzero_ratio": 18.53088053870129
+      },
+      {
+        "name": "resblocks.7.convs2.2",
+        "minimum_channel_abs_max": 0.027704160660505295,
+        "median_channel_abs_max": 0.21839027106761932,
+        "maximum_channel_abs_max": 0.5078356266021729,
+        "max_to_min_nonzero_ratio": 18.330662777527746
+      },
+      {
+        "name": "resblocks.1.convs1.1",
+        "minimum_channel_abs_max": 0.07414793968200684,
+        "median_channel_abs_max": 0.17779968678951263,
+        "maximum_channel_abs_max": 1.3187001943588257,
+        "max_to_min_nonzero_ratio": 17.784717957292468
+      },
+      {
+        "name": "resblocks.5.convs2.1",
+        "minimum_channel_abs_max": 0.03320778161287308,
+        "median_channel_abs_max": 0.12994925677776337,
+        "maximum_channel_abs_max": 0.49528950452804565,
+        "max_to_min_nonzero_ratio": 14.914862736149935
+      },
+      {
+        "name": "resblocks.4.convs2.1",
+        "minimum_channel_abs_max": 0.07572038471698761,
+        "median_channel_abs_max": 0.24923448264598846,
+        "maximum_channel_abs_max": 1.0866470336914062,
+        "max_to_min_nonzero_ratio": 14.35078595747838
+      }
+    ],
+    "highest_absolute_weight_layers": [
+      {
+        "name": "resblocks.5.convs1.1",
+        "abs_p99": 0.1297006756067276,
+        "abs_max": 1.848819613456726
+      },
+      {
+        "name": "resblocks.4.convs2.0",
+        "abs_p99": 0.19507260620594025,
+        "abs_max": 1.44527268409729
+      },
+      {
+        "name": "resblocks.1.convs1.1",
+        "abs_p99": 0.14762702584266663,
+        "abs_max": 1.3187001943588257
+      },
+      {
+        "name": "resblocks.4.convs1.1",
+        "abs_p99": 0.2629285454750061,
+        "abs_max": 1.1291455030441284
+      },
+      {
+        "name": "resblocks.4.convs2.1",
+        "abs_p99": 0.2955631613731384,
+        "abs_max": 1.0866470336914062
+      },
+      {
+        "name": "resblocks.8.convs1.2",
+        "abs_p99": 0.20323045551776886,
+        "abs_max": 1.0718133449554443
+      },
+      {
+        "name": "resblocks.1.convs2.2",
+        "abs_p99": 0.17358803749084473,
+        "abs_max": 1.0146535634994507
+      },
+      {
+        "name": "resblocks.4.convs1.2",
+        "abs_p99": 0.23404324054718018,
+        "abs_max": 0.9905273914337158
+      },
+      {
+        "name": "resblocks.1.convs2.0",
+        "abs_p99": 0.10933913290500641,
+        "abs_max": 0.9902668595314026
+      },
+      {
+        "name": "resblocks.9.convs2.2",
+        "abs_p99": 0.5412288904190063,
+        "abs_max": 0.947078287601471
+      },
+      {
+        "name": "resblocks.4.convs1.0",
+        "abs_p99": 0.19933000206947327,
+        "abs_max": 0.933393657207489
+      },
+      {
+        "name": "resblocks.10.convs2.1",
+        "abs_p99": 0.41650697588920593,
+        "abs_max": 0.9140903353691101
+      }
+    ],
+    "note": "Statistics describe the FP32 deployed weights. They identify candidate per-channel/QAT attention points but do not predict audible INT8 quality."
+  },
+  "operations": [
+    {
+      "name": "conv_pre",
+      "group": "pre",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        128,
+        96
+      ],
+      "output_shape": [
+        1,
+        192,
+        96
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 172224,
+      "macs": 16515072,
+      "weight": {
+        "elements": 172032,
+        "mean": -0.0008613415993750095,
+        "std": 0.05309202894568443,
+        "abs_p50": 0.030403830111026764,
+        "abs_p95": 0.10742690414190292,
+        "abs_p99": 0.16282737255096436,
+        "abs_max": 0.5951325297355652,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 12288,
+        "mean": 0.052689339965581894,
+        "std": 1.687194585800171,
+        "abs_p50": 0.9501609802246094,
+        "abs_p95": 3.467810869216919,
+        "abs_p99": 5.002377033233643,
+        "abs_max": 18.38325309753418,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 18432,
+        "mean": -6.955695152282715,
+        "std": 11.20588493347168,
+        "abs_p50": 8.461631774902344,
+        "abs_p95": 26.81702995300293,
+        "abs_p99": 33.68075180053711,
+        "abs_max": 55.01264190673828,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.1367381364107132,
+        "median_channel_abs_max": 0.21474666893482208,
+        "maximum_channel_abs_max": 0.5951325297355652,
+        "max_to_min_nonzero_ratio": 4.352352206614815
+      }
+    },
+    {
+      "name": "ups.0",
+      "group": "stage_0.upsample",
+      "type": "ConvTranspose1d",
+      "input_shape": [
+        1,
+        192,
+        96
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 16,
+      "stride": 8,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 295008,
+      "macs": 28311552,
+      "weight": {
+        "elements": 294912,
+        "mean": -2.3625732865184546e-05,
+        "std": 0.010305618867278099,
+        "abs_p50": 0.005410168319940567,
+        "abs_p95": 0.020889749750494957,
+        "abs_p99": 0.033676546066999435,
+        "abs_max": 0.20644649863243103,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 18432,
+        "mean": 0.8660264611244202,
+        "std": 5.058159351348877,
+        "abs_p50": 1.1865527629852295,
+        "abs_p95": 11.660245895385742,
+        "abs_p99": 23.303508758544922,
+        "abs_max": 46.29900360107422,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": -0.6291256546974182,
+        "std": 2.378192663192749,
+        "abs_p50": 1.1536157131195068,
+        "abs_p95": 5.30215311050415,
+        "abs_p99": 8.444464683532715,
+        "abs_max": 19.559524536132812,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.02703363075852394,
+        "median_channel_abs_max": 0.06593648344278336,
+        "maximum_channel_abs_max": 0.20644649863243103,
+        "max_to_min_nonzero_ratio": 7.6366545240075325
+      }
+    },
+    {
+      "name": "resblocks.0.convs1.0",
+      "group": "stage_0.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 27744,
+      "macs": 21233664,
+      "weight": {
+        "elements": 27648,
+        "mean": -0.0016649363096803427,
+        "std": 0.04151878505945206,
+        "abs_p50": 0.023877687752246857,
+        "abs_p95": 0.07983877509832382,
+        "abs_p99": 0.1239246353507042,
+        "abs_max": 0.7144647836685181,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 0.4202998876571655,
+        "std": 1.1755836009979248,
+        "abs_p50": 0.24433836340904236,
+        "abs_p95": 2.69380784034729,
+        "abs_p99": 5.216832637786865,
+        "abs_max": 13.954148292541504,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": -0.3795548379421234,
+        "std": 1.2602424621582031,
+        "abs_p50": 0.686858057975769,
+        "abs_p95": 2.698927402496338,
+        "abs_p99": 4.337810516357422,
+        "abs_max": 9.124189376831055,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.08633455634117126,
+        "median_channel_abs_max": 0.16115552186965942,
+        "maximum_channel_abs_max": 0.7144647836685181,
+        "max_to_min_nonzero_ratio": 8.27553663269135
+      }
+    },
+    {
+      "name": "resblocks.0.convs2.0",
+      "group": "stage_0.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 27744,
+      "macs": 21233664,
+      "weight": {
+        "elements": 27648,
+        "mean": 0.0015033582458272576,
+        "std": 0.0388665609061718,
+        "abs_p50": 0.023763349279761314,
+        "abs_p95": 0.07770736515522003,
+        "abs_p99": 0.11432813107967377,
+        "abs_max": 0.3243173360824585,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 0.21681340038776398,
+        "std": 0.569361686706543,
+        "abs_p50": 0.14966079592704773,
+        "abs_p95": 1.3882696628570557,
+        "abs_p99": 2.3659560680389404,
+        "abs_max": 5.6903581619262695,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": -0.051858264952898026,
+        "std": 1.1140170097351074,
+        "abs_p50": 0.5679213404655457,
+        "abs_p95": 2.1864798069000244,
+        "abs_p99": 3.764622211456299,
+        "abs_max": 10.542421340942383,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.05610010027885437,
+        "median_channel_abs_max": 0.12082456797361374,
+        "maximum_channel_abs_max": 0.3243173360824585,
+        "max_to_min_nonzero_ratio": 5.781047350546402
+      }
+    },
+    {
+      "name": "resblocks.0.convs1.1",
+      "group": "stage_0.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 3,
+      "groups": 1,
+      "parameters": 27744,
+      "macs": 21233664,
+      "weight": {
+        "elements": 27648,
+        "mean": -0.000614620978012681,
+        "std": 0.04380679875612259,
+        "abs_p50": 0.02683587744832039,
+        "abs_p95": 0.08883047848939896,
+        "abs_p99": 0.12614725530147552,
+        "abs_max": 0.25705841183662415,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 0.413066029548645,
+        "std": 1.115822196006775,
+        "abs_p50": 0.2574485242366791,
+        "abs_p95": 2.7167272567749023,
+        "abs_p99": 4.825372219085693,
+        "abs_max": 10.900416374206543,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": -0.4108063578605652,
+        "std": 1.398106575012207,
+        "abs_p50": 0.7904167175292969,
+        "abs_p95": 3.0092365741729736,
+        "abs_p99": 4.550200939178467,
+        "abs_max": 12.545248031616211,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.07943655550479889,
+        "median_channel_abs_max": 0.1286933720111847,
+        "maximum_channel_abs_max": 0.25705841183662415,
+        "max_to_min_nonzero_ratio": 3.236021630130914
+      }
+    },
+    {
+      "name": "resblocks.0.convs2.1",
+      "group": "stage_0.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 27744,
+      "macs": 21233664,
+      "weight": {
+        "elements": 27648,
+        "mean": 0.0020884734112769365,
+        "std": 0.04629441350698471,
+        "abs_p50": 0.028191111981868744,
+        "abs_p95": 0.09343039244413376,
+        "abs_p99": 0.13477574288845062,
+        "abs_max": 0.26465335488319397,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 0.25677305459976196,
+        "std": 0.6894425749778748,
+        "abs_p50": 0.17117738723754883,
+        "abs_p95": 1.5798234939575195,
+        "abs_p99": 3.0594236850738525,
+        "abs_max": 12.545248031616211,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": 0.11157724261283875,
+        "std": 1.3834248781204224,
+        "abs_p50": 0.7942860126495361,
+        "abs_p95": 2.8208353519439697,
+        "abs_p99": 4.395995616912842,
+        "abs_max": 11.617889404296875,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.058756470680236816,
+        "median_channel_abs_max": 0.14316140115261078,
+        "maximum_channel_abs_max": 0.26465335488319397,
+        "max_to_min_nonzero_ratio": 4.504241861691876
+      }
+    },
+    {
+      "name": "resblocks.0.convs1.2",
+      "group": "stage_0.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 5,
+      "groups": 1,
+      "parameters": 27744,
+      "macs": 21233664,
+      "weight": {
+        "elements": 27648,
+        "mean": 6.813314712417196e-07,
+        "std": 0.04478459432721138,
+        "abs_p50": 0.028503287583589554,
+        "abs_p95": 0.08879875391721725,
+        "abs_p99": 0.12391717731952667,
+        "abs_max": 0.25735437870025635,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 0.6940829157829285,
+        "std": 1.5978782176971436,
+        "abs_p50": 0.3465258479118347,
+        "abs_p95": 4.053936004638672,
+        "abs_p99": 6.710598468780518,
+        "abs_max": 19.981155395507812,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": -0.16845613718032837,
+        "std": 2.4880049228668213,
+        "abs_p50": 1.4372785091400146,
+        "abs_p95": 5.12739896774292,
+        "abs_p99": 7.468789577484131,
+        "abs_max": 25.66330337524414,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.0826488807797432,
+        "median_channel_abs_max": 0.14363926649093628,
+        "maximum_channel_abs_max": 0.25735437870025635,
+        "max_to_min_nonzero_ratio": 3.113827752684251
+      }
+    },
+    {
+      "name": "resblocks.0.convs2.2",
+      "group": "stage_0.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 27744,
+      "macs": 21233664,
+      "weight": {
+        "elements": 27648,
+        "mean": 0.00025491719134151936,
+        "std": 0.04375611990690231,
+        "abs_p50": 0.026384685188531876,
+        "abs_p95": 0.08794152736663818,
+        "abs_p99": 0.12684166431427002,
+        "abs_max": 0.25887537002563477,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 0.7490851879119873,
+        "std": 1.4831002950668335,
+        "abs_p50": 0.35619521141052246,
+        "abs_p95": 3.738412380218506,
+        "abs_p99": 6.277241230010986,
+        "abs_max": 25.66330337524414,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": -0.31513333320617676,
+        "std": 3.8554978370666504,
+        "abs_p50": 2.0552167892456055,
+        "abs_p95": 7.921507358551025,
+        "abs_p99": 12.916385650634766,
+        "abs_max": 26.935941696166992,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.05076225474476814,
+        "median_channel_abs_max": 0.14063182473182678,
+        "maximum_channel_abs_max": 0.25887537002563477,
+        "max_to_min_nonzero_ratio": 5.099761059221192
+      }
+    },
+    {
+      "name": "resblocks.1.convs1.0",
+      "group": "stage_0.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 64608,
+      "macs": 49545216,
+      "weight": {
+        "elements": 64512,
+        "mean": -0.002327861962839961,
+        "std": 0.03620973229408264,
+        "abs_p50": 0.018387965857982635,
+        "abs_p95": 0.06892267614603043,
+        "abs_p99": 0.11066660284996033,
+        "abs_max": 0.8210567831993103,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 0.4202998876571655,
+        "std": 1.1755836009979248,
+        "abs_p50": 0.24433836340904236,
+        "abs_p95": 2.69380784034729,
+        "abs_p99": 5.216832637786865,
+        "abs_max": 13.954148292541504,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": -1.081062912940979,
+        "std": 2.423916816711426,
+        "abs_p50": 1.498274803161621,
+        "abs_p95": 5.4409613609313965,
+        "abs_p99": 8.544878005981445,
+        "abs_max": 18.308582305908203,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.05944349989295006,
+        "median_channel_abs_max": 0.12498743832111359,
+        "maximum_channel_abs_max": 0.8210567831993103,
+        "max_to_min_nonzero_ratio": 13.812389658716695
+      }
+    },
+    {
+      "name": "resblocks.1.convs2.0",
+      "group": "stage_0.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 64608,
+      "macs": 49545216,
+      "weight": {
+        "elements": 64512,
+        "mean": -0.0018981794128194451,
+        "std": 0.037604935467243195,
+        "abs_p50": 0.017692551016807556,
+        "abs_p95": 0.06621697545051575,
+        "abs_p99": 0.10933913290500641,
+        "abs_max": 0.9902668595314026,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 0.2899000346660614,
+        "std": 1.1195958852767944,
+        "abs_p50": 0.2511979341506958,
+        "abs_p95": 2.498164653778076,
+        "abs_p99": 4.904318809509277,
+        "abs_max": 18.308582305908203,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": -0.6018036603927612,
+        "std": 3.739147424697876,
+        "abs_p50": 1.4077496528625488,
+        "abs_p95": 5.685483455657959,
+        "abs_p99": 10.650613784790039,
+        "abs_max": 111.40097045898438,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.03235657885670662,
+        "median_channel_abs_max": 0.10662610083818436,
+        "maximum_channel_abs_max": 0.9902668595314026,
+        "max_to_min_nonzero_ratio": 30.604807260893338
+      }
+    },
+    {
+      "name": "resblocks.1.convs1.1",
+      "group": "stage_0.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 3,
+      "groups": 1,
+      "parameters": 64608,
+      "macs": 49545216,
+      "weight": {
+        "elements": 64512,
+        "mean": -0.002941017970442772,
+        "std": 0.04970217123627663,
+        "abs_p50": 0.02660192735493183,
+        "abs_p95": 0.09373707324266434,
+        "abs_p99": 0.14762702584266663,
+        "abs_max": 1.3187001943588257,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 0.5452267527580261,
+        "std": 1.8156750202178955,
+        "abs_p50": 0.33720365166664124,
+        "abs_p95": 3.9405386447906494,
+        "abs_p99": 8.40368366241455,
+        "abs_max": 26.217674255371094,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": -1.749584674835205,
+        "std": 4.060135364532471,
+        "abs_p50": 2.0604333877563477,
+        "abs_p95": 9.404362678527832,
+        "abs_p99": 15.757140159606934,
+        "abs_max": 37.98102951049805,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.07414793968200684,
+        "median_channel_abs_max": 0.17779968678951263,
+        "maximum_channel_abs_max": 1.3187001943588257,
+        "max_to_min_nonzero_ratio": 17.784717957292468
+      }
+    },
+    {
+      "name": "resblocks.1.convs2.1",
+      "group": "stage_0.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 64608,
+      "macs": 49545216,
+      "weight": {
+        "elements": 64512,
+        "mean": -0.00198566447943449,
+        "std": 0.04923003539443016,
+        "abs_p50": 0.025099802762269974,
+        "abs_p95": 0.09553197026252747,
+        "abs_p99": 0.1549604833126068,
+        "abs_max": 0.8067356944084167,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 0.39975035190582275,
+        "std": 1.8664112091064453,
+        "abs_p50": 0.3351772725582123,
+        "abs_p95": 3.404348611831665,
+        "abs_p99": 8.670366287231445,
+        "abs_max": 33.51643753051758,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": -0.9352482557296753,
+        "std": 4.713733673095703,
+        "abs_p50": 1.5995008945465088,
+        "abs_p95": 9.651253700256348,
+        "abs_p99": 18.963516235351562,
+        "abs_max": 89.75857543945312,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.021285230293869972,
+        "median_channel_abs_max": 0.1592596024274826,
+        "maximum_channel_abs_max": 0.8067356944084167,
+        "max_to_min_nonzero_ratio": 37.90119642918555
+      }
+    },
+    {
+      "name": "resblocks.1.convs1.2",
+      "group": "stage_0.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 5,
+      "groups": 1,
+      "parameters": 64608,
+      "macs": 49545216,
+      "weight": {
+        "elements": 64512,
+        "mean": -0.0002531327772885561,
+        "std": 0.050477735698223114,
+        "abs_p50": 0.029872985556721687,
+        "abs_p95": 0.09750992059707642,
+        "abs_p99": 0.14966794848442078,
+        "abs_max": 0.7402547597885132,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 0.7283528447151184,
+        "std": 2.992595672607422,
+        "abs_p50": 0.487152636051178,
+        "abs_p95": 5.576676845550537,
+        "abs_p99": 13.630906105041504,
+        "abs_max": 60.39351272583008,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": -1.228466510772705,
+        "std": 5.791727066040039,
+        "abs_p50": 2.7128448486328125,
+        "abs_p95": 12.48869514465332,
+        "abs_p99": 21.08420753479004,
+        "abs_max": 61.284000396728516,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.11778043955564499,
+        "median_channel_abs_max": 0.18482661247253418,
+        "maximum_channel_abs_max": 0.7402547597885132,
+        "max_to_min_nonzero_ratio": 6.28503988082658
+      }
+    },
+    {
+      "name": "resblocks.1.convs2.2",
+      "group": "stage_0.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 64608,
+      "macs": 49545216,
+      "weight": {
+        "elements": 64512,
+        "mean": -0.005329012405127287,
+        "std": 0.05482985079288483,
+        "abs_p50": 0.027616940438747406,
+        "abs_p95": 0.11166015267372131,
+        "abs_p99": 0.17358803749084473,
+        "abs_max": 1.0146535634994507,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 1.1263599395751953,
+        "std": 3.2322258949279785,
+        "abs_p50": 0.5666927099227905,
+        "abs_p95": 6.512436866760254,
+        "abs_p99": 14.97815990447998,
+        "abs_max": 57.70409393310547,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": -4.8188018798828125,
+        "std": 8.925591468811035,
+        "abs_p50": 4.257487773895264,
+        "abs_p95": 20.3374080657959,
+        "abs_p99": 37.879920959472656,
+        "abs_max": 109.59933471679688,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.024924742057919502,
+        "median_channel_abs_max": 0.1904662698507309,
+        "maximum_channel_abs_max": 1.0146535634994507,
+        "max_to_min_nonzero_ratio": 40.70868862520718
+      }
+    },
+    {
+      "name": "resblocks.2.convs1.0",
+      "group": "stage_0.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 101472,
+      "macs": 77856768,
+      "weight": {
+        "elements": 101376,
+        "mean": -0.0026844143867492676,
+        "std": 0.020242774859070778,
+        "abs_p50": 0.01101146824657917,
+        "abs_p95": 0.0400632843375206,
+        "abs_p99": 0.0662810429930687,
+        "abs_max": 0.260470986366272,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 0.4202998876571655,
+        "std": 1.1755836009979248,
+        "abs_p50": 0.24433836340904236,
+        "abs_p95": 2.69380784034729,
+        "abs_p99": 5.216832637786865,
+        "abs_max": 13.954148292541504,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": -1.657163381576538,
+        "std": 3.0305912494659424,
+        "abs_p50": 1.9840452671051025,
+        "abs_p95": 7.127399444580078,
+        "abs_p99": 10.586623191833496,
+        "abs_max": 18.965667724609375,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.042999327182769775,
+        "median_channel_abs_max": 0.08177820593118668,
+        "maximum_channel_abs_max": 0.260470986366272,
+        "max_to_min_nonzero_ratio": 6.057559581319334
+      }
+    },
+    {
+      "name": "resblocks.2.convs2.0",
+      "group": "stage_0.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 101472,
+      "macs": 77856768,
+      "weight": {
+        "elements": 101376,
+        "mean": -0.00017271153046749532,
+        "std": 0.01904575154185295,
+        "abs_p50": 0.009763548150658607,
+        "abs_p95": 0.03837449103593826,
+        "abs_p99": 0.06259768456220627,
+        "abs_max": 0.2830498516559601,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 0.24456988275051117,
+        "std": 1.3249552249908447,
+        "abs_p50": 0.3134819567203522,
+        "abs_p95": 2.6378560066223145,
+        "abs_p99": 5.397838592529297,
+        "abs_max": 18.112398147583008,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": -1.1037077903747559,
+        "std": 3.0331954956054688,
+        "abs_p50": 1.6032472848892212,
+        "abs_p95": 6.074464321136475,
+        "abs_p99": 10.977603912353516,
+        "abs_max": 47.16844940185547,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.011120372451841831,
+        "median_channel_abs_max": 0.06956642121076584,
+        "maximum_channel_abs_max": 0.2830498516559601,
+        "max_to_min_nonzero_ratio": 25.453270821795133
+      }
+    },
+    {
+      "name": "resblocks.2.convs1.1",
+      "group": "stage_0.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 3,
+      "groups": 1,
+      "parameters": 101472,
+      "macs": 77856768,
+      "weight": {
+        "elements": 101376,
+        "mean": -0.0023355630692094564,
+        "std": 0.027582399547100067,
+        "abs_p50": 0.014893971383571625,
+        "abs_p95": 0.05417446047067642,
+        "abs_p99": 0.09067879617214203,
+        "abs_max": 0.31068816781044006,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 0.39805877208709717,
+        "std": 1.6519016027450562,
+        "abs_p50": 0.37244051694869995,
+        "abs_p95": 3.5960378646850586,
+        "abs_p99": 6.9330925941467285,
+        "abs_max": 21.64325714111328,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": -2.115211248397827,
+        "std": 3.388015031814575,
+        "abs_p50": 2.041445732116699,
+        "abs_p95": 7.632152557373047,
+        "abs_p99": 13.239568710327148,
+        "abs_max": 42.957122802734375,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.060083162039518356,
+        "median_channel_abs_max": 0.13568241894245148,
+        "maximum_channel_abs_max": 0.31068816781044006,
+        "max_to_min_nonzero_ratio": 5.170968991380511
+      }
+    },
+    {
+      "name": "resblocks.2.convs2.1",
+      "group": "stage_0.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 101472,
+      "macs": 77856768,
+      "weight": {
+        "elements": 101376,
+        "mean": -0.0006765574216842651,
+        "std": 0.0258240457624197,
+        "abs_p50": 0.012274529784917831,
+        "abs_p95": 0.05340637266635895,
+        "abs_p99": 0.0877489298582077,
+        "abs_max": 0.28740790486335754,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 0.09233912080526352,
+        "std": 1.0917890071868896,
+        "abs_p50": 0.29766514897346497,
+        "abs_p95": 2.2917606830596924,
+        "abs_p99": 4.474802017211914,
+        "abs_max": 19.434471130371094,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": -0.3412553071975708,
+        "std": 2.2250940799713135,
+        "abs_p50": 0.8458516597747803,
+        "abs_p95": 4.641528129577637,
+        "abs_p99": 7.872594833374023,
+        "abs_max": 31.318359375,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.01550967339426279,
+        "median_channel_abs_max": 0.1060609221458435,
+        "maximum_channel_abs_max": 0.28740790486335754,
+        "max_to_min_nonzero_ratio": 18.53088053870129
+      }
+    },
+    {
+      "name": "resblocks.2.convs1.2",
+      "group": "stage_0.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 5,
+      "groups": 1,
+      "parameters": 101472,
+      "macs": 77856768,
+      "weight": {
+        "elements": 101376,
+        "mean": -0.0023784609511494637,
+        "std": 0.03104238025844097,
+        "abs_p50": 0.017649374902248383,
+        "abs_p95": 0.06223224103450775,
+        "abs_p99": 0.0965736135840416,
+        "abs_max": 0.30707278847694397,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 0.26235705614089966,
+        "std": 1.4712700843811035,
+        "abs_p50": 0.3591034412384033,
+        "abs_p95": 3.2937142848968506,
+        "abs_p99": 6.587705135345459,
+        "abs_max": 17.313180923461914,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": -1.6496739387512207,
+        "std": 2.970003366470337,
+        "abs_p50": 1.504976511001587,
+        "abs_p95": 7.672574996948242,
+        "abs_p99": 10.658199310302734,
+        "abs_max": 23.049962997436523,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.08512613922357559,
+        "median_channel_abs_max": 0.1527627855539322,
+        "maximum_channel_abs_max": 0.30707278847694397,
+        "max_to_min_nonzero_ratio": 3.6072678883092175
+      }
+    },
+    {
+      "name": "resblocks.2.convs2.2",
+      "group": "stage_0.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        96,
+        768
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 101472,
+      "macs": 77856768,
+      "weight": {
+        "elements": 101376,
+        "mean": -0.0013198101660236716,
+        "std": 0.036194633692502975,
+        "abs_p50": 0.019087184220552444,
+        "abs_p95": 0.07149156928062439,
+        "abs_p99": 0.1200336366891861,
+        "abs_max": 0.49621811509132385,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 0.15342587232589722,
+        "std": 0.9946486353874207,
+        "abs_p50": 0.26365476846694946,
+        "abs_p95": 2.1899611949920654,
+        "abs_p99": 4.271867275238037,
+        "abs_max": 10.68151569366455,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 73728,
+        "mean": -0.20502880215644836,
+        "std": 3.0360589027404785,
+        "abs_p50": 1.257415771484375,
+        "abs_p95": 6.330306053161621,
+        "abs_p99": 11.535162925720215,
+        "abs_max": 25.706405639648438,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.045677896589040756,
+        "median_channel_abs_max": 0.1153252124786377,
+        "maximum_channel_abs_max": 0.49621811509132385,
+        "max_to_min_nonzero_ratio": 10.863418680499809
+      }
+    },
+    {
+      "name": "ups.1",
+      "group": "stage_1.upsample",
+      "type": "ConvTranspose1d",
+      "input_shape": [
+        1,
+        96,
+        768
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 16,
+      "stride": 8,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 73776,
+      "macs": 56623104,
+      "weight": {
+        "elements": 73728,
+        "mean": 0.0002869663294404745,
+        "std": 0.011511074379086494,
+        "abs_p50": 0.005914048291742802,
+        "abs_p95": 0.0218528900295496,
+        "abs_p99": 0.03604190796613693,
+        "abs_max": 0.22498434782028198,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 73728,
+        "mean": 0.1904621571302414,
+        "std": 1.9475826025009155,
+        "abs_p50": 0.45955538749694824,
+        "abs_p95": 4.318516254425049,
+        "abs_p99": 8.728981971740723,
+        "abs_max": 45.131282806396484,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": 0.03962535411119461,
+        "std": 0.3423095643520355,
+        "abs_p50": 0.14830949902534485,
+        "abs_p95": 0.717251181602478,
+        "abs_p99": 1.174269676208496,
+        "abs_max": 3.6347217559814453,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.03223343566060066,
+        "median_channel_abs_max": 0.05745137482881546,
+        "maximum_channel_abs_max": 0.22498434782028198,
+        "max_to_min_nonzero_ratio": 6.9798438549720965
+      }
+    },
+    {
+      "name": "resblocks.3.convs1.0",
+      "group": "stage_1.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 6960,
+      "macs": 42467328,
+      "weight": {
+        "elements": 6912,
+        "mean": -0.0004298767016734928,
+        "std": 0.08949051797389984,
+        "abs_p50": 0.05393733084201813,
+        "abs_p95": 0.18085739016532898,
+        "abs_p99": 0.2574547827243805,
+        "abs_max": 0.7739519476890564,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.12626293301582336,
+        "std": 0.23276259005069733,
+        "abs_p50": 0.04780961945652962,
+        "abs_p95": 0.5741240382194519,
+        "abs_p99": 0.9938313961029053,
+        "abs_max": 3.6347217559814453,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.023288292810320854,
+        "std": 0.26337993144989014,
+        "abs_p50": 0.11622428894042969,
+        "abs_p95": 0.5617856383323669,
+        "abs_p99": 0.8796745538711548,
+        "abs_max": 1.9717625379562378,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.11085105687379837,
+        "median_channel_abs_max": 0.2732166051864624,
+        "maximum_channel_abs_max": 0.7739519476890564,
+        "max_to_min_nonzero_ratio": 6.981908603453232
+      }
+    },
+    {
+      "name": "resblocks.3.convs2.0",
+      "group": "stage_1.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 6960,
+      "macs": 42467328,
+      "weight": {
+        "elements": 6912,
+        "mean": 0.0023263366892933846,
+        "std": 0.08247170597314835,
+        "abs_p50": 0.04963026940822601,
+        "abs_p95": 0.1661989986896515,
+        "abs_p99": 0.2487194836139679,
+        "abs_max": 0.4177297055721283,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.06926633417606354,
+        "std": 0.1479804962873459,
+        "abs_p50": 0.03246200829744339,
+        "abs_p95": 0.3830869197845459,
+        "abs_p99": 0.6261178851127625,
+        "abs_max": 1.6096837520599365,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": 0.01892951875925064,
+        "std": 0.24551323056221008,
+        "abs_p50": 0.1035982221364975,
+        "abs_p95": 0.5143201351165771,
+        "abs_p99": 0.8429425954818726,
+        "abs_max": 2.723649263381958,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.06580454111099243,
+        "median_channel_abs_max": 0.23447886109352112,
+        "maximum_channel_abs_max": 0.4177297055721283,
+        "max_to_min_nonzero_ratio": 6.348037666086664
+      }
+    },
+    {
+      "name": "resblocks.3.convs1.1",
+      "group": "stage_1.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 3,
+      "groups": 1,
+      "parameters": 6960,
+      "macs": 42467328,
+      "weight": {
+        "elements": 6912,
+        "mean": 0.00028335832757875323,
+        "std": 0.09705605357885361,
+        "abs_p50": 0.05896328389644623,
+        "abs_p95": 0.19338934123516083,
+        "abs_p99": 0.2751903831958771,
+        "abs_max": 0.5026195049285889,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.14161869883537292,
+        "std": 0.22980645298957825,
+        "abs_p50": 0.05554623156785965,
+        "abs_p95": 0.6135159730911255,
+        "abs_p99": 0.9301659464836121,
+        "abs_max": 2.4871597290039062,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.02176353521645069,
+        "std": 0.2630253732204437,
+        "abs_p50": 0.1191089004278183,
+        "abs_p95": 0.5608693361282349,
+        "abs_p99": 0.8551912307739258,
+        "abs_max": 2.3929872512817383,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.16044723987579346,
+        "median_channel_abs_max": 0.297039657831192,
+        "maximum_channel_abs_max": 0.5026195049285889,
+        "max_to_min_nonzero_ratio": 3.1326154648573588
+      }
+    },
+    {
+      "name": "resblocks.3.convs2.1",
+      "group": "stage_1.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 6960,
+      "macs": 42467328,
+      "weight": {
+        "elements": 6912,
+        "mean": 0.00032940576784312725,
+        "std": 0.10029001533985138,
+        "abs_p50": 0.05917111784219742,
+        "abs_p95": 0.20109185576438904,
+        "abs_p99": 0.2979324460029602,
+        "abs_max": 0.6689184904098511,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.07042500376701355,
+        "std": 0.15330694615840912,
+        "abs_p50": 0.029957540333271027,
+        "abs_p95": 0.40583422780036926,
+        "abs_p99": 0.6534295082092285,
+        "abs_max": 2.3929872512817383,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": 0.023366712033748627,
+        "std": 0.2327616661787033,
+        "abs_p50": 0.09977251291275024,
+        "abs_p95": 0.5005131363868713,
+        "abs_p99": 0.7767887711524963,
+        "abs_max": 2.8705880641937256,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.12467313557863235,
+        "median_channel_abs_max": 0.2582487463951111,
+        "maximum_channel_abs_max": 0.6689184904098511,
+        "max_to_min_nonzero_ratio": 5.365377932505425
+      }
+    },
+    {
+      "name": "resblocks.3.convs1.2",
+      "group": "stage_1.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 5,
+      "groups": 1,
+      "parameters": 6960,
+      "macs": 42467328,
+      "weight": {
+        "elements": 6912,
+        "mean": 0.004761580843478441,
+        "std": 0.09330540150403976,
+        "abs_p50": 0.05655653029680252,
+        "abs_p95": 0.18982714414596558,
+        "abs_p99": 0.26847711205482483,
+        "abs_max": 0.5240206718444824,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.18330131471157074,
+        "std": 0.29817280173301697,
+        "abs_p50": 0.06626319885253906,
+        "abs_p95": 0.8058074712753296,
+        "abs_p99": 1.2138975858688354,
+        "abs_max": 4.911762237548828,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": 0.11008565872907639,
+        "std": 0.39806005358695984,
+        "abs_p50": 0.17449530959129333,
+        "abs_p95": 0.8910587430000305,
+        "abs_p99": 1.4231650829315186,
+        "abs_max": 2.675682306289673,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.15745607018470764,
+        "median_channel_abs_max": 0.27374210953712463,
+        "maximum_channel_abs_max": 0.5240206718444824,
+        "max_to_min_nonzero_ratio": 3.328043632930552
+      }
+    },
+    {
+      "name": "resblocks.3.convs2.2",
+      "group": "stage_1.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 6960,
+      "macs": 42467328,
+      "weight": {
+        "elements": 6912,
+        "mean": -0.004973244853317738,
+        "std": 0.08906546980142593,
+        "abs_p50": 0.04415837675333023,
+        "abs_p95": 0.18390130996704102,
+        "abs_p99": 0.308383971452713,
+        "abs_max": 0.8061597943305969,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.1866264045238495,
+        "std": 0.3083648085594177,
+        "abs_p50": 0.06354697048664093,
+        "abs_p95": 0.8306003212928772,
+        "abs_p99": 1.3709067106246948,
+        "abs_max": 2.675682306289673,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.1542961597442627,
+        "std": 0.715133011341095,
+        "abs_p50": 0.2752740979194641,
+        "abs_p95": 1.5433096885681152,
+        "abs_p99": 2.6493239402770996,
+        "abs_max": 6.213040351867676,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.12321805953979492,
+        "median_channel_abs_max": 0.21422693133354187,
+        "maximum_channel_abs_max": 0.8061597943305969,
+        "max_to_min_nonzero_ratio": 6.542545770818902
+      }
+    },
+    {
+      "name": "resblocks.4.convs1.0",
+      "group": "stage_1.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 16176,
+      "macs": 99090432,
+      "weight": {
+        "elements": 16128,
+        "mean": -0.0022544865496456623,
+        "std": 0.06494659185409546,
+        "abs_p50": 0.03276647627353668,
+        "abs_p95": 0.12352380901575089,
+        "abs_p99": 0.19933000206947327,
+        "abs_max": 0.933393657207489,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.12626293301582336,
+        "std": 0.23276259005069733,
+        "abs_p50": 0.04780961945652962,
+        "abs_p95": 0.5741240382194519,
+        "abs_p99": 0.9938313961029053,
+        "abs_max": 3.6347217559814453,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.22597993910312653,
+        "std": 0.9471874237060547,
+        "abs_p50": 0.1938968300819397,
+        "abs_p95": 1.522764801979065,
+        "abs_p99": 4.072258949279785,
+        "abs_max": 19.649675369262695,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.08886285126209259,
+        "median_channel_abs_max": 0.21035197377204895,
+        "maximum_channel_abs_max": 0.933393657207489,
+        "max_to_min_nonzero_ratio": 10.503755438304951
+      }
+    },
+    {
+      "name": "resblocks.4.convs2.0",
+      "group": "stage_1.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 16176,
+      "macs": 99090432,
+      "weight": {
+        "elements": 16128,
+        "mean": -0.0018239928176626563,
+        "std": 0.0646829754114151,
+        "abs_p50": 0.029172446578741074,
+        "abs_p95": 0.11524434387683868,
+        "abs_p99": 0.19507260620594025,
+        "abs_max": 1.44527268409729,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.07188282161951065,
+        "std": 0.29976287484169006,
+        "abs_p50": 0.0397975817322731,
+        "abs_p95": 0.6118228435516357,
+        "abs_p99": 1.3734151124954224,
+        "abs_max": 4.340242385864258,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.06414654105901718,
+        "std": 0.48735105991363525,
+        "abs_p50": 0.11577439308166504,
+        "abs_p95": 0.9994863271713257,
+        "abs_p99": 2.073253631591797,
+        "abs_max": 6.205142974853516,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.05568240210413933,
+        "median_channel_abs_max": 0.1569250226020813,
+        "maximum_channel_abs_max": 1.44527268409729,
+        "max_to_min_nonzero_ratio": 25.9556454011141
+      }
+    },
+    {
+      "name": "resblocks.4.convs1.1",
+      "group": "stage_1.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 3,
+      "groups": 1,
+      "parameters": 16176,
+      "macs": 99090432,
+      "weight": {
+        "elements": 16128,
+        "mean": -0.0027987153735011816,
+        "std": 0.08632417023181915,
+        "abs_p50": 0.04665469750761986,
+        "abs_p95": 0.16600078344345093,
+        "abs_p99": 0.2629285454750061,
+        "abs_max": 1.1291455030441284,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.13986101746559143,
+        "std": 0.3170938491821289,
+        "abs_p50": 0.049145203083753586,
+        "abs_p95": 0.7727564573287964,
+        "abs_p99": 1.4214199781417847,
+        "abs_max": 5.348842620849609,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.2020675539970398,
+        "std": 0.6996336579322815,
+        "abs_p50": 0.19915732741355896,
+        "abs_p95": 1.5850410461425781,
+        "abs_p99": 2.8967742919921875,
+        "abs_max": 7.971426010131836,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.1425304263830185,
+        "median_channel_abs_max": 0.3721123933792114,
+        "maximum_channel_abs_max": 1.1291455030441284,
+        "max_to_min_nonzero_ratio": 7.922136569000387
+      }
+    },
+    {
+      "name": "resblocks.4.convs2.1",
+      "group": "stage_1.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 16176,
+      "macs": 99090432,
+      "weight": {
+        "elements": 16128,
+        "mean": -0.002044179942458868,
+        "std": 0.08670864254236221,
+        "abs_p50": 0.040142882615327835,
+        "abs_p95": 0.1702406257390976,
+        "abs_p99": 0.2955631613731384,
+        "abs_max": 1.0866470336914062,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.07676956802606583,
+        "std": 0.3010793626308441,
+        "abs_p50": 0.04406663030385971,
+        "abs_p95": 0.6196072101593018,
+        "abs_p99": 1.420268177986145,
+        "abs_max": 5.468728542327881,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.03940721973776817,
+        "std": 0.651060938835144,
+        "abs_p50": 0.13937988877296448,
+        "abs_p95": 1.33906888961792,
+        "abs_p99": 2.7953383922576904,
+        "abs_max": 8.532526969909668,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.07572038471698761,
+        "median_channel_abs_max": 0.24923448264598846,
+        "maximum_channel_abs_max": 1.0866470336914062,
+        "max_to_min_nonzero_ratio": 14.35078595747838
+      }
+    },
+    {
+      "name": "resblocks.4.convs1.2",
+      "group": "stage_1.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 5,
+      "groups": 1,
+      "parameters": 16176,
+      "macs": 99090432,
+      "weight": {
+        "elements": 16128,
+        "mean": -0.002138516865670681,
+        "std": 0.07868777960538864,
+        "abs_p50": 0.04363016039133072,
+        "abs_p95": 0.15102577209472656,
+        "abs_p99": 0.23404324054718018,
+        "abs_max": 0.9905273914337158,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.1826782077550888,
+        "std": 0.46947917342185974,
+        "abs_p50": 0.0639234185218811,
+        "abs_p95": 1.043032169342041,
+        "abs_p99": 2.1764121055603027,
+        "abs_max": 8.99373722076416,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.11388307064771652,
+        "std": 0.8613966703414917,
+        "abs_p50": 0.23904147744178772,
+        "abs_p95": 1.8854987621307373,
+        "abs_p99": 3.501966953277588,
+        "abs_max": 10.819977760314941,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.13877969980239868,
+        "median_channel_abs_max": 0.35109028220176697,
+        "maximum_channel_abs_max": 0.9905273914337158,
+        "max_to_min_nonzero_ratio": 7.137408373444222
+      }
+    },
+    {
+      "name": "resblocks.4.convs2.2",
+      "group": "stage_1.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 16176,
+      "macs": 99090432,
+      "weight": {
+        "elements": 16128,
+        "mean": -0.004010311793535948,
+        "std": 0.07967302203178406,
+        "abs_p50": 0.04106747359037399,
+        "abs_p95": 0.1614169478416443,
+        "abs_p99": 0.25439363718032837,
+        "abs_max": 0.8723779320716858,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.16032639145851135,
+        "std": 0.45488181710243225,
+        "abs_p50": 0.0587499663233757,
+        "abs_p95": 1.0036487579345703,
+        "abs_p99": 2.145566701889038,
+        "abs_max": 6.543846130371094,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.3065413236618042,
+        "std": 1.3017123937606812,
+        "abs_p50": 0.3011518120765686,
+        "abs_p95": 2.6984496116638184,
+        "abs_p99": 5.612899303436279,
+        "abs_max": 16.326539993286133,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.07018297165632248,
+        "median_channel_abs_max": 0.2446906417608261,
+        "maximum_channel_abs_max": 0.8723779320716858,
+        "max_to_min_nonzero_ratio": 12.43005121446859
+      }
+    },
+    {
+      "name": "resblocks.5.convs1.0",
+      "group": "stage_1.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 25392,
+      "macs": 155713536,
+      "weight": {
+        "elements": 25344,
+        "mean": -0.0016980061773210764,
+        "std": 0.033384084701538086,
+        "abs_p50": 0.01870366558432579,
+        "abs_p95": 0.06914309412240982,
+        "abs_p99": 0.10204195976257324,
+        "abs_max": 0.32430392503738403,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.12626293301582336,
+        "std": 0.23276259005069733,
+        "abs_p50": 0.04780961945652962,
+        "abs_p95": 0.5741240382194519,
+        "abs_p99": 0.9938313961029053,
+        "abs_max": 3.6347217559814453,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.29710906744003296,
+        "std": 0.6561375856399536,
+        "abs_p50": 0.2684270739555359,
+        "abs_p95": 1.5483006238937378,
+        "abs_p99": 2.6538753509521484,
+        "abs_max": 4.956459999084473,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.06735268235206604,
+        "median_channel_abs_max": 0.11761850863695145,
+        "maximum_channel_abs_max": 0.32430392503738403,
+        "max_to_min_nonzero_ratio": 4.815011276643476
+      }
+    },
+    {
+      "name": "resblocks.5.convs2.0",
+      "group": "stage_1.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 25392,
+      "macs": 155713536,
+      "weight": {
+        "elements": 25344,
+        "mean": -0.0003300757671240717,
+        "std": 0.02946939505636692,
+        "abs_p50": 0.016095299273729324,
+        "abs_p95": 0.05921098217368126,
+        "abs_p99": 0.09300816059112549,
+        "abs_max": 0.3323540687561035,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.04389379918575287,
+        "std": 0.23597028851509094,
+        "abs_p50": 0.04745654761791229,
+        "abs_p95": 0.5087642669677734,
+        "abs_p99": 1.0862774848937988,
+        "abs_max": 2.273646593093872,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.1324746310710907,
+        "std": 0.4116930365562439,
+        "abs_p50": 0.16311487555503845,
+        "abs_p95": 0.9425407648086548,
+        "abs_p99": 1.5813294649124146,
+        "abs_max": 3.217158079147339,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.045233555138111115,
+        "median_channel_abs_max": 0.09089792519807816,
+        "maximum_channel_abs_max": 0.3323540687561035,
+        "max_to_min_nonzero_ratio": 7.347511548480559
+      }
+    },
+    {
+      "name": "resblocks.5.convs1.1",
+      "group": "stage_1.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 3,
+      "groups": 1,
+      "parameters": 25392,
+      "macs": 155713536,
+      "weight": {
+        "elements": 25344,
+        "mean": -0.002057727426290512,
+        "std": 0.045071449130773544,
+        "abs_p50": 0.02507997676730156,
+        "abs_p95": 0.08570703864097595,
+        "abs_p99": 0.1297006756067276,
+        "abs_max": 1.848819613456726,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.10649837553501129,
+        "std": 0.28062161803245544,
+        "abs_p50": 0.04422323405742645,
+        "abs_p95": 0.7022137641906738,
+        "abs_p99": 1.254455804824829,
+        "abs_max": 3.4366979598999023,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.1396334171295166,
+        "std": 0.5459270477294922,
+        "abs_p50": 0.19916194677352905,
+        "abs_p95": 1.2641136646270752,
+        "abs_p99": 2.0013463497161865,
+        "abs_max": 4.360067367553711,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.09913338720798492,
+        "median_channel_abs_max": 0.15993310511112213,
+        "maximum_channel_abs_max": 1.848819613456726,
+        "max_to_min_nonzero_ratio": 18.64981784167069
+      }
+    },
+    {
+      "name": "resblocks.5.convs2.1",
+      "group": "stage_1.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 25392,
+      "macs": 155713536,
+      "weight": {
+        "elements": 25344,
+        "mean": -0.0003382974537089467,
+        "std": 0.04336852207779884,
+        "abs_p50": 0.021219534799456596,
+        "abs_p95": 0.08834313601255417,
+        "abs_p99": 0.14116933941841125,
+        "abs_max": 0.49528950452804565,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.08468234539031982,
+        "std": 0.26664116978645325,
+        "abs_p50": 0.03694145753979683,
+        "abs_p95": 0.6685117483139038,
+        "abs_p99": 1.1988314390182495,
+        "abs_max": 3.0111286640167236,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.0037422983441501856,
+        "std": 0.5374280214309692,
+        "abs_p50": 0.13095718622207642,
+        "abs_p95": 1.2620397806167603,
+        "abs_p99": 2.0834577083587646,
+        "abs_max": 4.051588535308838,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.03320778161287308,
+        "median_channel_abs_max": 0.12994925677776337,
+        "maximum_channel_abs_max": 0.49528950452804565,
+        "max_to_min_nonzero_ratio": 14.914862736149935
+      }
+    },
+    {
+      "name": "resblocks.5.convs1.2",
+      "group": "stage_1.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 5,
+      "groups": 1,
+      "parameters": 25392,
+      "macs": 155713536,
+      "weight": {
+        "elements": 25344,
+        "mean": -0.0009870582725852728,
+        "std": 0.04999208822846413,
+        "abs_p50": 0.02902230992913246,
+        "abs_p95": 0.09870941191911697,
+        "abs_p99": 0.15227192640304565,
+        "abs_max": 0.8078219890594482,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.16025854647159576,
+        "std": 0.409623384475708,
+        "abs_p50": 0.05773143097758293,
+        "abs_p95": 1.0313104391098022,
+        "abs_p99": 1.8454251289367676,
+        "abs_max": 4.0119194984436035,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.18618103861808777,
+        "std": 0.8162590265274048,
+        "abs_p50": 0.2261592298746109,
+        "abs_p95": 1.8206676244735718,
+        "abs_p99": 3.3900136947631836,
+        "abs_max": 6.543501853942871,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.0933685153722763,
+        "median_channel_abs_max": 0.18045318126678467,
+        "maximum_channel_abs_max": 0.8078219890594482,
+        "max_to_min_nonzero_ratio": 8.651974231768849
+      }
+    },
+    {
+      "name": "resblocks.5.convs2.2",
+      "group": "stage_1.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        48,
+        6144
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 25392,
+      "macs": 155713536,
+      "weight": {
+        "elements": 25344,
+        "mean": -0.0035734933335334063,
+        "std": 0.04915348067879677,
+        "abs_p50": 0.026904210448265076,
+        "abs_p95": 0.09912724792957306,
+        "abs_p99": 0.1517549753189087,
+        "abs_max": 0.5373260378837585,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.11428894102573395,
+        "std": 0.3615257143974304,
+        "abs_p50": 0.050284937024116516,
+        "abs_p95": 0.8652082681655884,
+        "abs_p99": 1.6651270389556885,
+        "abs_max": 3.800828456878662,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.23059208691120148,
+        "std": 0.9360343813896179,
+        "abs_p50": 0.2430671751499176,
+        "abs_p95": 2.024839401245117,
+        "abs_p99": 3.8119843006134033,
+        "abs_max": 10.186080932617188,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.04077942669391632,
+        "median_channel_abs_max": 0.18169309198856354,
+        "maximum_channel_abs_max": 0.5373260378837585,
+        "max_to_min_nonzero_ratio": 13.176399999853837
+      }
+    },
+    {
+      "name": "ups.2",
+      "group": "stage_2.upsample",
+      "type": "ConvTranspose1d",
+      "input_shape": [
+        1,
+        48,
+        6144
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 4,
+      "stride": 2,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 4632,
+      "macs": 28311552,
+      "weight": {
+        "elements": 4608,
+        "mean": 0.0024370772298425436,
+        "std": 0.03201145678758621,
+        "abs_p50": 0.0152028389275074,
+        "abs_p95": 0.06774111092090607,
+        "abs_p99": 0.10715673118829727,
+        "abs_max": 0.2636377513408661,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.13578496873378754,
+        "std": 0.4750117361545563,
+        "abs_p50": 0.05564504116773605,
+        "abs_p95": 1.1317651271820068,
+        "abs_p99": 2.19370436668396,
+        "abs_max": 5.723997592926025,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": 0.05883249267935753,
+        "std": 0.16043396294116974,
+        "abs_p50": 0.05416239798069,
+        "abs_p95": 0.36598557233810425,
+        "abs_p99": 0.648396372795105,
+        "abs_max": 2.7053608894348145,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.05046159401535988,
+        "median_channel_abs_max": 0.10395932197570801,
+        "maximum_channel_abs_max": 0.2636377513408661,
+        "max_to_min_nonzero_ratio": 5.224522857138006
+      }
+    },
+    {
+      "name": "resblocks.6.convs1.0",
+      "group": "stage_2.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 1752,
+      "macs": 21233664,
+      "weight": {
+        "elements": 1728,
+        "mean": 0.003063178388401866,
+        "std": 0.09177286922931671,
+        "abs_p50": 0.05744149163365364,
+        "abs_p95": 0.18128882348537445,
+        "abs_p99": 0.2599845826625824,
+        "abs_max": 0.4086933434009552,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.07841282337903976,
+        "std": 0.1252000480890274,
+        "abs_p50": 0.035612087696790695,
+        "abs_p95": 0.31380873918533325,
+        "abs_p99": 0.5811331868171692,
+        "abs_max": 2.7053608894348145,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.00445391982793808,
+        "std": 0.1422797292470932,
+        "abs_p50": 0.04324839636683464,
+        "abs_p95": 0.30122652649879456,
+        "abs_p99": 0.5700376033782959,
+        "abs_max": 1.908436894416809,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.15620963275432587,
+        "median_channel_abs_max": 0.2311570942401886,
+        "maximum_channel_abs_max": 0.4086933434009552,
+        "max_to_min_nonzero_ratio": 2.616313323287276
+      }
+    },
+    {
+      "name": "resblocks.6.convs2.0",
+      "group": "stage_2.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 1752,
+      "macs": 21233664,
+      "weight": {
+        "elements": 1728,
+        "mean": 0.004480308853089809,
+        "std": 0.09054473787546158,
+        "abs_p50": 0.052323777228593826,
+        "abs_p95": 0.1865244358778,
+        "abs_p99": 0.28592535853385925,
+        "abs_max": 0.5034011006355286,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.03504601866006851,
+        "std": 0.09262602776288986,
+        "abs_p50": 0.012017318047583103,
+        "abs_p95": 0.194707989692688,
+        "abs_p99": 0.43367624282836914,
+        "abs_max": 1.908436894416809,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.030569544062018394,
+        "std": 0.14748455584049225,
+        "abs_p50": 0.04132995754480362,
+        "abs_p95": 0.2579311728477478,
+        "abs_p99": 0.6780015826225281,
+        "abs_max": 3.0018653869628906,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.11722316592931747,
+        "median_channel_abs_max": 0.2096935361623764,
+        "maximum_channel_abs_max": 0.5034011006355286,
+        "max_to_min_nonzero_ratio": 4.294382399969186
+      }
+    },
+    {
+      "name": "resblocks.6.convs1.1",
+      "group": "stage_2.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 3,
+      "groups": 1,
+      "parameters": 1752,
+      "macs": 21233664,
+      "weight": {
+        "elements": 1728,
+        "mean": 0.002354277530685067,
+        "std": 0.0981694683432579,
+        "abs_p50": 0.0584871843457222,
+        "abs_p95": 0.1900160163640976,
+        "abs_p99": 0.28606775403022766,
+        "abs_max": 0.5957129597663879,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.06702092289924622,
+        "std": 0.11142760515213013,
+        "abs_p50": 0.0365227535367012,
+        "abs_p95": 0.27160707116127014,
+        "abs_p99": 0.4961545467376709,
+        "abs_max": 1.6127303838729858,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.001703435555100441,
+        "std": 0.0987805500626564,
+        "abs_p50": 0.04340089112520218,
+        "abs_p95": 0.20974282920360565,
+        "abs_p99": 0.357206791639328,
+        "abs_max": 1.4082651138305664,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.15624670684337616,
+        "median_channel_abs_max": 0.24388696253299713,
+        "maximum_channel_abs_max": 0.5957129597663879,
+        "max_to_min_nonzero_ratio": 3.8126432985466936
+      }
+    },
+    {
+      "name": "resblocks.6.convs2.1",
+      "group": "stage_2.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 1752,
+      "macs": 21233664,
+      "weight": {
+        "elements": 1728,
+        "mean": 0.00361743220128119,
+        "std": 0.1016075387597084,
+        "abs_p50": 0.05110149085521698,
+        "abs_p95": 0.21346916258335114,
+        "abs_p99": 0.32808807492256165,
+        "abs_max": 0.6311107277870178,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.028611639514565468,
+        "std": 0.06274426728487015,
+        "abs_p50": 0.011880990117788315,
+        "abs_p95": 0.15124046802520752,
+        "abs_p99": 0.28390997648239136,
+        "abs_max": 1.3174781799316406,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": 0.00851584691554308,
+        "std": 0.0937746986746788,
+        "abs_p50": 0.04530198499560356,
+        "abs_p95": 0.19690845906734467,
+        "abs_p99": 0.3438269793987274,
+        "abs_max": 1.1313551664352417,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.07511505484580994,
+        "median_channel_abs_max": 0.25872281193733215,
+        "maximum_channel_abs_max": 0.6311107277870178,
+        "max_to_min_nonzero_ratio": 8.401920614749073
+      }
+    },
+    {
+      "name": "resblocks.6.convs1.2",
+      "group": "stage_2.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 5,
+      "groups": 1,
+      "parameters": 1752,
+      "macs": 21233664,
+      "weight": {
+        "elements": 1728,
+        "mean": 0.0007860342739149928,
+        "std": 0.09453986585140228,
+        "abs_p50": 0.0570824109017849,
+        "abs_p95": 0.18693527579307556,
+        "abs_p99": 0.28169962763786316,
+        "abs_max": 0.5937735438346863,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.08611147105693817,
+        "std": 0.14407163858413696,
+        "abs_p50": 0.051798950880765915,
+        "abs_p95": 0.342462420463562,
+        "abs_p99": 0.6535423398017883,
+        "abs_max": 1.9277265071868896,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.011455112136900425,
+        "std": 0.11333083361387253,
+        "abs_p50": 0.04152178019285202,
+        "abs_p95": 0.25550577044487,
+        "abs_p99": 0.42392152547836304,
+        "abs_max": 1.2960041761398315,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.15333497524261475,
+        "median_channel_abs_max": 0.2540093660354614,
+        "maximum_channel_abs_max": 0.5937735438346863,
+        "max_to_min_nonzero_ratio": 3.872394689438507
+      }
+    },
+    {
+      "name": "resblocks.6.convs2.2",
+      "group": "stage_2.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 1752,
+      "macs": 21233664,
+      "weight": {
+        "elements": 1728,
+        "mean": 0.012019914574921131,
+        "std": 0.11060763150453568,
+        "abs_p50": 0.05783446505665779,
+        "abs_p95": 0.24025750160217285,
+        "abs_p99": 0.3827952444553375,
+        "abs_max": 0.5557833909988403,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.025787563994526863,
+        "std": 0.0681571513414383,
+        "abs_p50": 0.009733750484883785,
+        "abs_p95": 0.15727020800113678,
+        "abs_p99": 0.32282909750938416,
+        "abs_max": 1.2960041761398315,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": 0.03480982035398483,
+        "std": 0.1754903793334961,
+        "abs_p50": 0.06824691593647003,
+        "abs_p95": 0.3503210246562958,
+        "abs_p99": 0.7741294503211975,
+        "abs_max": 3.5765740871429443,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.0802258774638176,
+        "median_channel_abs_max": 0.23185448348522186,
+        "maximum_channel_abs_max": 0.5557833909988403,
+        "max_to_min_nonzero_ratio": 6.927732155369722
+      }
+    },
+    {
+      "name": "resblocks.7.convs1.0",
+      "group": "stage_2.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 4056,
+      "macs": 49545216,
+      "weight": {
+        "elements": 4032,
+        "mean": 0.00019463595526758581,
+        "std": 0.07418923825025558,
+        "abs_p50": 0.0423760861158371,
+        "abs_p95": 0.1497514396905899,
+        "abs_p99": 0.2339096963405609,
+        "abs_max": 0.45942234992980957,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.07841282337903976,
+        "std": 0.1252000480890274,
+        "abs_p50": 0.035612087696790695,
+        "abs_p95": 0.31380873918533325,
+        "abs_p99": 0.5811331868171692,
+        "abs_max": 2.7053608894348145,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": 0.006732592824846506,
+        "std": 0.14262115955352783,
+        "abs_p50": 0.04350628703832626,
+        "abs_p95": 0.29335546493530273,
+        "abs_p99": 0.5447145104408264,
+        "abs_max": 2.8428361415863037,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.1492885947227478,
+        "median_channel_abs_max": 0.24884843826293945,
+        "maximum_channel_abs_max": 0.45942234992980957,
+        "max_to_min_nonzero_ratio": 3.0774109086030887
+      }
+    },
+    {
+      "name": "resblocks.7.convs2.0",
+      "group": "stage_2.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 4056,
+      "macs": 49545216,
+      "weight": {
+        "elements": 4032,
+        "mean": 0.0028951112180948257,
+        "std": 0.07331319898366928,
+        "abs_p50": 0.0394081175327301,
+        "abs_p95": 0.15170983970165253,
+        "abs_p99": 0.23970992863178253,
+        "abs_max": 0.40676349401474,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.042149584740400314,
+        "std": 0.10377883911132812,
+        "abs_p50": 0.010285446420311928,
+        "abs_p95": 0.245893195271492,
+        "abs_p99": 0.48983585834503174,
+        "abs_max": 1.9207720756530762,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.018894901499152184,
+        "std": 0.12868137657642365,
+        "abs_p50": 0.03984135389328003,
+        "abs_p95": 0.2743181884288788,
+        "abs_p99": 0.5193093419075012,
+        "abs_max": 1.881255865097046,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.08814393728971481,
+        "median_channel_abs_max": 0.19533443450927734,
+        "maximum_channel_abs_max": 0.40676349401474,
+        "max_to_min_nonzero_ratio": 4.6147642880732045
+      }
+    },
+    {
+      "name": "resblocks.7.convs1.1",
+      "group": "stage_2.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 3,
+      "groups": 1,
+      "parameters": 4056,
+      "macs": 49545216,
+      "weight": {
+        "elements": 4032,
+        "mean": -0.0013398374430835247,
+        "std": 0.08707763254642487,
+        "abs_p50": 0.05166971683502197,
+        "abs_p95": 0.17755398154258728,
+        "abs_p99": 0.2645331025123596,
+        "abs_max": 0.47996920347213745,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.06908131390810013,
+        "std": 0.1266992837190628,
+        "abs_p50": 0.024449100717902184,
+        "abs_p95": 0.3053833842277527,
+        "abs_p99": 0.5643503665924072,
+        "abs_max": 2.5375871658325195,
+        "zero_fraction": 3.3908420391526306e-06
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.03296419605612755,
+        "std": 0.1679537445306778,
+        "abs_p50": 0.056541360914707184,
+        "abs_p95": 0.3466757833957672,
+        "abs_p99": 0.6475473642349243,
+        "abs_max": 2.984494924545288,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.14257241785526276,
+        "median_channel_abs_max": 0.270792692899704,
+        "maximum_channel_abs_max": 0.47996920347213745,
+        "max_to_min_nonzero_ratio": 3.366494099576782
+      }
+    },
+    {
+      "name": "resblocks.7.convs2.1",
+      "group": "stage_2.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 4056,
+      "macs": 49545216,
+      "weight": {
+        "elements": 4032,
+        "mean": -0.0007055361638776958,
+        "std": 0.10229834169149399,
+        "abs_p50": 0.046653732657432556,
+        "abs_p95": 0.2115458995103836,
+        "abs_p99": 0.37157267332077026,
+        "abs_max": 0.7796610593795776,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.02919507957994938,
+        "std": 0.09412318468093872,
+        "abs_p50": 0.010139770805835724,
+        "abs_p95": 0.21355482935905457,
+        "abs_p99": 0.4226663112640381,
+        "abs_max": 1.7226738929748535,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.03356580063700676,
+        "std": 0.13021916151046753,
+        "abs_p50": 0.03925812989473343,
+        "abs_p95": 0.2572263479232788,
+        "abs_p99": 0.5730865001678467,
+        "abs_max": 2.898188591003418,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.09881564974784851,
+        "median_channel_abs_max": 0.24934187531471252,
+        "maximum_channel_abs_max": 0.7796610593795776,
+        "max_to_min_nonzero_ratio": 7.890056497822633
+      }
+    },
+    {
+      "name": "resblocks.7.convs1.2",
+      "group": "stage_2.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 5,
+      "groups": 1,
+      "parameters": 4056,
+      "macs": 49545216,
+      "weight": {
+        "elements": 4032,
+        "mean": -0.001134253921918571,
+        "std": 0.07917211204767227,
+        "abs_p50": 0.042513005435466766,
+        "abs_p95": 0.15918318927288055,
+        "abs_p99": 0.25348764657974243,
+        "abs_max": 0.543792724609375,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.05786791816353798,
+        "std": 0.1284041553735733,
+        "abs_p50": 0.022131744772195816,
+        "abs_p95": 0.29780855774879456,
+        "abs_p99": 0.5781131982803345,
+        "abs_max": 2.4527149200439453,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.029059698805212975,
+        "std": 0.16542036831378937,
+        "abs_p50": 0.05501933395862579,
+        "abs_p95": 0.3623042106628418,
+        "abs_p99": 0.6355260014533997,
+        "abs_max": 1.8849951028823853,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.11150560528039932,
+        "median_channel_abs_max": 0.30563849210739136,
+        "maximum_channel_abs_max": 0.543792724609375,
+        "max_to_min_nonzero_ratio": 4.876819629308483
+      }
+    },
+    {
+      "name": "resblocks.7.convs2.2",
+      "group": "stage_2.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 4056,
+      "macs": 49545216,
+      "weight": {
+        "elements": 4032,
+        "mean": 0.004560171160846949,
+        "std": 0.09542442858219147,
+        "abs_p50": 0.040809858590364456,
+        "abs_p95": 0.20733575522899628,
+        "abs_p99": 0.32097598910331726,
+        "abs_max": 0.5078356266021729,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.030541015788912773,
+        "std": 0.10252569615840912,
+        "abs_p50": 0.0104479119181633,
+        "abs_p95": 0.21045660972595215,
+        "abs_p99": 0.4904549717903137,
+        "abs_max": 1.668864369392395,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": 0.012187710963189602,
+        "std": 0.3633706271648407,
+        "abs_p50": 0.05850652605295181,
+        "abs_p95": 0.770085334777832,
+        "abs_p99": 1.5969622135162354,
+        "abs_max": 4.427079200744629,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.027704160660505295,
+        "median_channel_abs_max": 0.21839027106761932,
+        "maximum_channel_abs_max": 0.5078356266021729,
+        "max_to_min_nonzero_ratio": 18.330662777527746
+      }
+    },
+    {
+      "name": "resblocks.8.convs1.0",
+      "group": "stage_2.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 6360,
+      "macs": 77856768,
+      "weight": {
+        "elements": 6336,
+        "mean": 0.0007800390012562275,
+        "std": 0.04963991045951843,
+        "abs_p50": 0.028532840311527252,
+        "abs_p95": 0.09992284327745438,
+        "abs_p99": 0.14452725648880005,
+        "abs_max": 0.6494344472885132,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.07841282337903976,
+        "std": 0.1252000480890274,
+        "abs_p50": 0.035612087696790695,
+        "abs_p95": 0.31380873918533325,
+        "abs_p99": 0.5811331868171692,
+        "abs_max": 2.7053608894348145,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.01315874233841896,
+        "std": 0.18830659985542297,
+        "abs_p50": 0.06102953851222992,
+        "abs_p95": 0.40800851583480835,
+        "abs_p99": 0.7113354802131653,
+        "abs_max": 2.4794187545776367,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.08333240449428558,
+        "median_channel_abs_max": 0.1536969691514969,
+        "maximum_channel_abs_max": 0.6494344472885132,
+        "max_to_min_nonzero_ratio": 7.793300232120956
+      }
+    },
+    {
+      "name": "resblocks.8.convs2.0",
+      "group": "stage_2.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 6360,
+      "macs": 77856768,
+      "weight": {
+        "elements": 6336,
+        "mean": 0.0029570171609520912,
+        "std": 0.05066720023751259,
+        "abs_p50": 0.024318579584360123,
+        "abs_p95": 0.0988105908036232,
+        "abs_p99": 0.18016086518764496,
+        "abs_max": 0.6338706612586975,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.0448848120868206,
+        "std": 0.126098170876503,
+        "abs_p50": 0.01250537484884262,
+        "abs_p95": 0.29539862275123596,
+        "abs_p99": 0.5871940851211548,
+        "abs_max": 2.3338286876678467,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": 0.002433174289762974,
+        "std": 0.18262673914432526,
+        "abs_p50": 0.04013858363032341,
+        "abs_p95": 0.3740465044975281,
+        "abs_p99": 0.7895680665969849,
+        "abs_max": 2.4630067348480225,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.08462502062320709,
+        "median_channel_abs_max": 0.14268703758716583,
+        "maximum_channel_abs_max": 0.6338706612586975,
+        "max_to_min_nonzero_ratio": 7.4903457227030605
+      }
+    },
+    {
+      "name": "resblocks.8.convs1.1",
+      "group": "stage_2.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 3,
+      "groups": 1,
+      "parameters": 6360,
+      "macs": 77856768,
+      "weight": {
+        "elements": 6336,
+        "mean": 0.0012965473579242826,
+        "std": 0.057150956243276596,
+        "abs_p50": 0.03053267113864422,
+        "abs_p95": 0.1087065115571022,
+        "abs_p99": 0.1747203916311264,
+        "abs_max": 0.6775426268577576,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.09449625015258789,
+        "std": 0.1805642992258072,
+        "abs_p50": 0.0268482007086277,
+        "abs_p95": 0.42630577087402344,
+        "abs_p99": 0.8505155444145203,
+        "abs_max": 3.2726712226867676,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": 0.0075978911481797695,
+        "std": 0.2325996458530426,
+        "abs_p50": 0.06281574070453644,
+        "abs_p95": 0.5019901394844055,
+        "abs_p99": 0.9679805636405945,
+        "abs_max": 2.227888345718384,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.11947734653949738,
+        "median_channel_abs_max": 0.19589278101921082,
+        "maximum_channel_abs_max": 0.6775426268577576,
+        "max_to_min_nonzero_ratio": 5.670887799920902
+      }
+    },
+    {
+      "name": "resblocks.8.convs2.1",
+      "group": "stage_2.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 6360,
+      "macs": 77856768,
+      "weight": {
+        "elements": 6336,
+        "mean": -0.001261852914467454,
+        "std": 0.06276561319828033,
+        "abs_p50": 0.027159541845321655,
+        "abs_p95": 0.12599271535873413,
+        "abs_p99": 0.2389886975288391,
+        "abs_max": 0.7266387939453125,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.06371612846851349,
+        "std": 0.15913282334804535,
+        "abs_p50": 0.013928556814789772,
+        "abs_p95": 0.3675902187824249,
+        "abs_p99": 0.7753691077232361,
+        "abs_max": 2.0186855792999268,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.061692409217357635,
+        "std": 0.33289799094200134,
+        "abs_p50": 0.06798107922077179,
+        "abs_p95": 0.7503768801689148,
+        "abs_p99": 1.368006706237793,
+        "abs_max": 4.282533168792725,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.09018833935260773,
+        "median_channel_abs_max": 0.16986089944839478,
+        "maximum_channel_abs_max": 0.7266387939453125,
+        "max_to_min_nonzero_ratio": 8.056904020644907
+      }
+    },
+    {
+      "name": "resblocks.8.convs1.2",
+      "group": "stage_2.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 5,
+      "groups": 1,
+      "parameters": 6360,
+      "macs": 77856768,
+      "weight": {
+        "elements": 6336,
+        "mean": 0.0004287588526494801,
+        "std": 0.05628926679491997,
+        "abs_p50": 0.0226893313229084,
+        "abs_p95": 0.09764803946018219,
+        "abs_p99": 0.20323045551776886,
+        "abs_max": 1.0718133449554443,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.10404875129461288,
+        "std": 0.26384618878364563,
+        "abs_p50": 0.03082217648625374,
+        "abs_p95": 0.6051704287528992,
+        "abs_p99": 1.2256413698196411,
+        "abs_max": 4.32861328125,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.018731998279690742,
+        "std": 0.30171748995780945,
+        "abs_p50": 0.07675457000732422,
+        "abs_p95": 0.6531345844268799,
+        "abs_p99": 1.1505968570709229,
+        "abs_max": 3.210901975631714,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.08739401400089264,
+        "median_channel_abs_max": 0.17830945551395416,
+        "maximum_channel_abs_max": 1.0718133449554443,
+        "max_to_min_nonzero_ratio": 12.264150550911838
+      }
+    },
+    {
+      "name": "resblocks.8.convs2.2",
+      "group": "stage_2.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        24,
+        12288
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 6360,
+      "macs": 77856768,
+      "weight": {
+        "elements": 6336,
+        "mean": 0.004704282619059086,
+        "std": 0.05495589226484299,
+        "abs_p50": 0.023844297975301743,
+        "abs_p95": 0.11220567673444748,
+        "abs_p99": 0.19228355586528778,
+        "abs_max": 0.5600807666778564,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.06809747219085693,
+        "std": 0.19880597293376923,
+        "abs_p50": 0.019583914428949356,
+        "abs_p95": 0.4276667833328247,
+        "abs_p99": 0.9431071281433105,
+        "abs_max": 3.210901975631714,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": 0.14312709867954254,
+        "std": 0.5382083058357239,
+        "abs_p50": 0.09639100730419159,
+        "abs_p95": 1.2018550634384155,
+        "abs_p99": 2.254783868789673,
+        "abs_max": 7.403971195220947,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.061567485332489014,
+        "median_channel_abs_max": 0.12438669055700302,
+        "maximum_channel_abs_max": 0.5600807666778564,
+        "max_to_min_nonzero_ratio": 9.097021969521682
+      }
+    },
+    {
+      "name": "ups.3",
+      "group": "stage_3.upsample",
+      "type": "ConvTranspose1d",
+      "input_shape": [
+        1,
+        24,
+        12288
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 4,
+      "stride": 2,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 1164,
+      "macs": 14155776,
+      "weight": {
+        "elements": 1152,
+        "mean": 0.001972845057025552,
+        "std": 0.05074388161301613,
+        "abs_p50": 0.029292196035385132,
+        "abs_p95": 0.09978500753641129,
+        "abs_p99": 0.1421596258878708,
+        "abs_max": 0.21234293282032013,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.1469186693429947,
+        "std": 0.2972003221511841,
+        "abs_p50": 0.046382054686546326,
+        "abs_p95": 0.7050396800041199,
+        "abs_p99": 1.4061756134033203,
+        "abs_max": 3.896426200866699,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.005869758781045675,
+        "std": 0.16213522851467133,
+        "abs_p50": 0.052018240094184875,
+        "abs_p95": 0.32727259397506714,
+        "abs_p99": 0.6495494246482849,
+        "abs_max": 2.003303050994873,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.06226776912808418,
+        "median_channel_abs_max": 0.14497219026088715,
+        "maximum_channel_abs_max": 0.21234293282032013,
+        "max_to_min_nonzero_ratio": 3.4101580286830706
+      }
+    },
+    {
+      "name": "resblocks.9.convs1.0",
+      "group": "stage_3.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 444,
+      "macs": 10616832,
+      "weight": {
+        "elements": 432,
+        "mean": -0.004260867368429899,
+        "std": 0.10094114392995834,
+        "abs_p50": 0.05246604606509209,
+        "abs_p95": 0.20648574829101562,
+        "abs_p99": 0.3155609667301178,
+        "abs_max": 0.44477272033691406,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.039112284779548645,
+        "std": 0.08822215348482132,
+        "abs_p50": 0.015363156795501709,
+        "abs_p95": 0.19908295571804047,
+        "abs_p99": 0.39496079087257385,
+        "abs_max": 1.4575845003128052,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.030733181163668633,
+        "std": 0.05572161450982094,
+        "abs_p50": 0.023030586540699005,
+        "abs_p95": 0.11155986040830612,
+        "abs_p99": 0.21836823225021362,
+        "abs_max": 0.7612953186035156,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.006872076541185379,
+        "median_channel_abs_max": 0.2772679030895233,
+        "maximum_channel_abs_max": 0.44477272033691406,
+        "max_to_min_nonzero_ratio": 64.72173551492403
+      }
+    },
+    {
+      "name": "resblocks.9.convs2.0",
+      "group": "stage_3.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 444,
+      "macs": 10616832,
+      "weight": {
+        "elements": 432,
+        "mean": 0.011325751431286335,
+        "std": 0.11533751338720322,
+        "abs_p50": 0.06151344254612923,
+        "abs_p95": 0.2438979148864746,
+        "abs_p99": 0.39672571420669556,
+        "abs_max": 0.5413967967033386,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.0018965338822454214,
+        "std": 0.01893974095582962,
+        "abs_p50": 0.00546466326341033,
+        "abs_p95": 0.03073946014046669,
+        "abs_p99": 0.07791917771100998,
+        "abs_max": 0.7102094292640686,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": 0.029263056814670563,
+        "std": 0.03654641658067703,
+        "abs_p50": 0.025751350447535515,
+        "abs_p95": 0.0838482603430748,
+        "abs_p99": 0.12671875953674316,
+        "abs_max": 0.6347745656967163,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.1402951329946518,
+        "median_channel_abs_max": 0.227261483669281,
+        "maximum_channel_abs_max": 0.5413967967033386,
+        "max_to_min_nonzero_ratio": 3.858984878142403
+      }
+    },
+    {
+      "name": "resblocks.9.convs1.1",
+      "group": "stage_3.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 3,
+      "groups": 1,
+      "parameters": 444,
+      "macs": 10616832,
+      "weight": {
+        "elements": 432,
+        "mean": 0.0072736539877951145,
+        "std": 0.10103082656860352,
+        "abs_p50": 0.052345193922519684,
+        "abs_p95": 0.21910470724105835,
+        "abs_p99": 0.3261374235153198,
+        "abs_max": 0.37262576818466187,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.05433228984475136,
+        "std": 0.09050890058279037,
+        "abs_p50": 0.030469899997115135,
+        "abs_p95": 0.21331994235515594,
+        "abs_p99": 0.4083106517791748,
+        "abs_max": 1.4198551177978516,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.011135329492390156,
+        "std": 0.055609218776226044,
+        "abs_p50": 0.021733736619353294,
+        "abs_p95": 0.11532988399267197,
+        "abs_p99": 0.21921676397323608,
+        "abs_max": 0.6868844032287598,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.1841924786567688,
+        "median_channel_abs_max": 0.27059206366539,
+        "maximum_channel_abs_max": 0.37262576818466187,
+        "max_to_min_nonzero_ratio": 2.0230238004399017
+      }
+    },
+    {
+      "name": "resblocks.9.convs2.1",
+      "group": "stage_3.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 444,
+      "macs": 10616832,
+      "weight": {
+        "elements": 432,
+        "mean": -0.01015550922602415,
+        "std": 0.14009474217891693,
+        "abs_p50": 0.06546911597251892,
+        "abs_p95": 0.26584142446517944,
+        "abs_p99": 0.5221500396728516,
+        "abs_max": 0.8957010507583618,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.00996553897857666,
+        "std": 0.038245975971221924,
+        "abs_p50": 0.004019691608846188,
+        "abs_p95": 0.06666126847267151,
+        "abs_p99": 0.19211554527282715,
+        "abs_max": 0.6868844032287598,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.07498323917388916,
+        "std": 0.09543115645647049,
+        "abs_p50": 0.06731757521629333,
+        "abs_p95": 0.2219800502061844,
+        "abs_p99": 0.4922928214073181,
+        "abs_max": 1.6686570644378662,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.14578858017921448,
+        "median_channel_abs_max": 0.2770678699016571,
+        "maximum_channel_abs_max": 0.8957010507583618,
+        "max_to_min_nonzero_ratio": 6.143835475023472
+      }
+    },
+    {
+      "name": "resblocks.9.convs1.2",
+      "group": "stage_3.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 5,
+      "groups": 1,
+      "parameters": 444,
+      "macs": 10616832,
+      "weight": {
+        "elements": 432,
+        "mean": -0.0014242662582546473,
+        "std": 0.10266420990228653,
+        "abs_p50": 0.053902119398117065,
+        "abs_p95": 0.20977866649627686,
+        "abs_p99": 0.3143429160118103,
+        "abs_max": 0.5699529051780701,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.0214832853525877,
+        "std": 0.07398787885904312,
+        "abs_p50": 0.011345816776156425,
+        "abs_p95": 0.16298796236515045,
+        "abs_p99": 0.3294273614883423,
+        "abs_max": 1.187265157699585,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.03410957753658295,
+        "std": 0.06512618064880371,
+        "abs_p50": 0.024445267394185066,
+        "abs_p95": 0.16070927679538727,
+        "abs_p99": 0.2397388070821762,
+        "abs_max": 0.6099473237991333,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.13269802927970886,
+        "median_channel_abs_max": 0.2662616968154907,
+        "maximum_channel_abs_max": 0.5699529051780701,
+        "max_to_min_nonzero_ratio": 4.295112054578363
+      }
+    },
+    {
+      "name": "resblocks.9.convs2.2",
+      "group": "stage_3.resblock_k3",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 3,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 444,
+      "macs": 10616832,
+      "weight": {
+        "elements": 432,
+        "mean": -0.005437774583697319,
+        "std": 0.1353093683719635,
+        "abs_p50": 0.05655979365110397,
+        "abs_p95": 0.2773720622062683,
+        "abs_p99": 0.5412288904190063,
+        "abs_max": 0.947078287601471,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.0023640564177185297,
+        "std": 0.021893497556447983,
+        "abs_p50": 0.004934010095894337,
+        "abs_p95": 0.038515616208314896,
+        "abs_p99": 0.1045793667435646,
+        "abs_max": 0.5402466654777527,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.02147883176803589,
+        "std": 0.10984178632497787,
+        "abs_p50": 0.07899307459592819,
+        "abs_p95": 0.1892067790031433,
+        "abs_p99": 0.3702593445777893,
+        "abs_max": 0.9772928357124329,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.13413648307323456,
+        "median_channel_abs_max": 0.22671273350715637,
+        "maximum_channel_abs_max": 0.947078287601471,
+        "max_to_min_nonzero_ratio": 7.06055702298676
+      }
+    },
+    {
+      "name": "resblocks.10.convs1.0",
+      "group": "stage_3.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 1020,
+      "macs": 24772608,
+      "weight": {
+        "elements": 1008,
+        "mean": -0.0023583355359733105,
+        "std": 0.08662572503089905,
+        "abs_p50": 0.042690373957157135,
+        "abs_p95": 0.16384387016296387,
+        "abs_p99": 0.28783294558525085,
+        "abs_max": 0.7332495450973511,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.039112284779548645,
+        "std": 0.08822215348482132,
+        "abs_p50": 0.015363156795501709,
+        "abs_p95": 0.19908295571804047,
+        "abs_p99": 0.39496079087257385,
+        "abs_max": 1.4575845003128052,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.025868544355034828,
+        "std": 0.09472048282623291,
+        "abs_p50": 0.030812615528702736,
+        "abs_p95": 0.19654767215251923,
+        "abs_p99": 0.4212598204612732,
+        "abs_max": 2.1431524753570557,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.16742026805877686,
+        "median_channel_abs_max": 0.2237098217010498,
+        "maximum_channel_abs_max": 0.7332495450973511,
+        "max_to_min_nonzero_ratio": 4.379694009568342
+      }
+    },
+    {
+      "name": "resblocks.10.convs2.0",
+      "group": "stage_3.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 1020,
+      "macs": 24772608,
+      "weight": {
+        "elements": 1008,
+        "mean": 0.011104422621428967,
+        "std": 0.1040172204375267,
+        "abs_p50": 0.05124697834253311,
+        "abs_p95": 0.21895787119865417,
+        "abs_p99": 0.35149529576301575,
+        "abs_max": 0.481620192527771,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.009853914380073547,
+        "std": 0.045271363109350204,
+        "abs_p50": 0.00483804102987051,
+        "abs_p95": 0.07664607465267181,
+        "abs_p99": 0.20865929126739502,
+        "abs_max": 1.2312467098236084,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.018820462748408318,
+        "std": 0.1004943922162056,
+        "abs_p50": 0.028151044622063637,
+        "abs_p95": 0.16398046910762787,
+        "abs_p99": 0.4654453694820404,
+        "abs_max": 1.7268950939178467,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.09829308092594147,
+        "median_channel_abs_max": 0.3081655204296112,
+        "maximum_channel_abs_max": 0.481620192527771,
+        "max_to_min_nonzero_ratio": 4.899838198078721
+      }
+    },
+    {
+      "name": "resblocks.10.convs1.1",
+      "group": "stage_3.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 3,
+      "groups": 1,
+      "parameters": 1020,
+      "macs": 24772608,
+      "weight": {
+        "elements": 1008,
+        "mean": 0.0050009130500257015,
+        "std": 0.07697205245494843,
+        "abs_p50": 0.0431290864944458,
+        "abs_p95": 0.15296830236911774,
+        "abs_p99": 0.23758912086486816,
+        "abs_max": 0.4568635821342468,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.03526866063475609,
+        "std": 0.10971078276634216,
+        "abs_p50": 0.015180101618170738,
+        "abs_p95": 0.19868044555187225,
+        "abs_p99": 0.4624657928943634,
+        "abs_max": 2.805781126022339,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.02068212255835533,
+        "std": 0.08817315101623535,
+        "abs_p50": 0.02946285717189312,
+        "abs_p95": 0.1590360850095749,
+        "abs_p99": 0.38198405504226685,
+        "abs_max": 1.5186302661895752,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.19340956211090088,
+        "median_channel_abs_max": 0.24107952415943146,
+        "maximum_channel_abs_max": 0.4568635821342468,
+        "max_to_min_nonzero_ratio": 2.3621561268634776
+      }
+    },
+    {
+      "name": "resblocks.10.convs2.1",
+      "group": "stage_3.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 1020,
+      "macs": 24772608,
+      "weight": {
+        "elements": 1008,
+        "mean": -0.0014141866704449058,
+        "std": 0.12586237490177155,
+        "abs_p50": 0.053726181387901306,
+        "abs_p95": 0.2585958242416382,
+        "abs_p99": 0.41650697588920593,
+        "abs_max": 0.9140903353691101,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.010761252604424953,
+        "std": 0.043944213539361954,
+        "abs_p50": 0.006203341763466597,
+        "abs_p95": 0.07438009232282639,
+        "abs_p99": 0.20354638993740082,
+        "abs_max": 0.8352434635162354,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.02730218879878521,
+        "std": 0.16269227862358093,
+        "abs_p50": 0.040824778378009796,
+        "abs_p95": 0.2604410946369171,
+        "abs_p99": 0.7213008403778076,
+        "abs_max": 2.8443758487701416,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.10114980489015579,
+        "median_channel_abs_max": 0.27123498916625977,
+        "maximum_channel_abs_max": 0.9140903353691101,
+        "max_to_min_nonzero_ratio": 9.036995537082564
+      }
+    },
+    {
+      "name": "resblocks.10.convs1.2",
+      "group": "stage_3.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 5,
+      "groups": 1,
+      "parameters": 1020,
+      "macs": 24772608,
+      "weight": {
+        "elements": 1008,
+        "mean": -0.0018511665984988213,
+        "std": 0.08095148205757141,
+        "abs_p50": 0.039584994316101074,
+        "abs_p95": 0.1707582324743271,
+        "abs_p99": 0.24538196623325348,
+        "abs_max": 0.494337797164917,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.025842348113656044,
+        "std": 0.1011127158999443,
+        "abs_p50": 0.0130551066249609,
+        "abs_p95": 0.177387073636055,
+        "abs_p99": 0.3968612551689148,
+        "abs_max": 2.9667952060699463,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.03527747094631195,
+        "std": 0.08082322031259537,
+        "abs_p50": 0.032850515097379684,
+        "abs_p95": 0.17066337168216705,
+        "abs_p99": 0.31149983406066895,
+        "abs_max": 1.2151046991348267,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.14386340975761414,
+        "median_channel_abs_max": 0.22044165432453156,
+        "maximum_channel_abs_max": 0.494337797164917,
+        "max_to_min_nonzero_ratio": 3.436160716597735
+      }
+    },
+    {
+      "name": "resblocks.10.convs2.2",
+      "group": "stage_3.resblock_k7",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 1020,
+      "macs": 24772608,
+      "weight": {
+        "elements": 1008,
+        "mean": 0.005033217370510101,
+        "std": 0.11417370289564133,
+        "abs_p50": 0.043718524277210236,
+        "abs_p95": 0.23344102501869202,
+        "abs_p99": 0.44038233160972595,
+        "abs_max": 0.7680785059928894,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.005348840728402138,
+        "std": 0.03382468223571777,
+        "abs_p50": 0.005661917384713888,
+        "abs_p95": 0.06668983399868011,
+        "abs_p99": 0.1545936018228531,
+        "abs_max": 0.652959406375885,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": 0.001855390379205346,
+        "std": 0.08040415495634079,
+        "abs_p50": 0.035038337111473083,
+        "abs_p95": 0.12524881958961487,
+        "abs_p99": 0.28628993034362793,
+        "abs_max": 1.7594784498214722,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.10313930362462997,
+        "median_channel_abs_max": 0.25049084424972534,
+        "maximum_channel_abs_max": 0.7680785059928894,
+        "max_to_min_nonzero_ratio": 7.447001084943044
+      }
+    },
+    {
+      "name": "resblocks.11.convs1.0",
+      "group": "stage_3.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 1596,
+      "macs": 38928384,
+      "weight": {
+        "elements": 1584,
+        "mean": 0.009063883684575558,
+        "std": 0.07123655825853348,
+        "abs_p50": 0.04238381236791611,
+        "abs_p95": 0.14483480155467987,
+        "abs_p99": 0.21618354320526123,
+        "abs_max": 0.45500606298446655,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.039112284779548645,
+        "std": 0.08822215348482132,
+        "abs_p50": 0.015363156795501709,
+        "abs_p95": 0.19908295571804047,
+        "abs_p99": 0.39496079087257385,
+        "abs_max": 1.4575845003128052,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": 0.029793722555041313,
+        "std": 0.13247376680374146,
+        "abs_p50": 0.03846671059727669,
+        "abs_p95": 0.2966345548629761,
+        "abs_p99": 0.5386287569999695,
+        "abs_max": 1.6113567352294922,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.14167390763759613,
+        "median_channel_abs_max": 0.19809415936470032,
+        "maximum_channel_abs_max": 0.45500606298446655,
+        "max_to_min_nonzero_ratio": 3.2116433475413024
+      }
+    },
+    {
+      "name": "resblocks.11.convs2.0",
+      "group": "stage_3.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 1596,
+      "macs": 38928384,
+      "weight": {
+        "elements": 1584,
+        "mean": 0.0035903851967304945,
+        "std": 0.06412120163440704,
+        "abs_p50": 0.03571135550737381,
+        "abs_p95": 0.13555045425891876,
+        "abs_p99": 0.19083073735237122,
+        "abs_max": 0.3762100636959076,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.052278175950050354,
+        "std": 0.10701572149991989,
+        "abs_p50": 0.016629759222269058,
+        "abs_p95": 0.26385802030563354,
+        "abs_p99": 0.5123491883277893,
+        "abs_max": 1.6113567352294922,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": 0.05550535023212433,
+        "std": 0.1624249815940857,
+        "abs_p50": 0.04386220499873161,
+        "abs_p95": 0.34984785318374634,
+        "abs_p99": 0.7295791506767273,
+        "abs_max": 2.1169300079345703,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.10927411913871765,
+        "median_channel_abs_max": 0.18656113743782043,
+        "maximum_channel_abs_max": 0.3762100636959076,
+        "max_to_min_nonzero_ratio": 3.442810307336626
+      }
+    },
+    {
+      "name": "resblocks.11.convs1.1",
+      "group": "stage_3.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 3,
+      "groups": 1,
+      "parameters": 1596,
+      "macs": 38928384,
+      "weight": {
+        "elements": 1584,
+        "mean": 0.00555400038138032,
+        "std": 0.06670451909303665,
+        "abs_p50": 0.03499765694141388,
+        "abs_p95": 0.13590717315673828,
+        "abs_p99": 0.20638065040111542,
+        "abs_max": 0.5416884422302246,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.08814743161201477,
+        "std": 0.17682020366191864,
+        "abs_p50": 0.030238676816225052,
+        "abs_p95": 0.4244680404663086,
+        "abs_p99": 0.8227936625480652,
+        "abs_max": 2.8920416831970215,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": 0.05860946699976921,
+        "std": 0.2701355516910553,
+        "abs_p50": 0.067323699593544,
+        "abs_p95": 0.5350819230079651,
+        "abs_p99": 1.2073845863342285,
+        "abs_max": 3.336756706237793,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.15525944530963898,
+        "median_channel_abs_max": 0.2444312423467636,
+        "maximum_channel_abs_max": 0.5416884422302246,
+        "max_to_min_nonzero_ratio": 3.488924240003033
+      }
+    },
+    {
+      "name": "resblocks.11.convs2.1",
+      "group": "stage_3.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 1596,
+      "macs": 38928384,
+      "weight": {
+        "elements": 1584,
+        "mean": -0.002898501232266426,
+        "std": 0.061856597661972046,
+        "abs_p50": 0.028897155076265335,
+        "abs_p95": 0.13889464735984802,
+        "abs_p99": 0.20815706253051758,
+        "abs_max": 0.3388980031013489,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.0997525081038475,
+        "std": 0.23687298595905304,
+        "abs_p50": 0.026885204017162323,
+        "abs_p95": 0.5213744640350342,
+        "abs_p99": 1.206291913986206,
+        "abs_max": 3.336756706237793,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.04648923501372337,
+        "std": 0.40867942571640015,
+        "abs_p50": 0.05281281843781471,
+        "abs_p95": 0.96640944480896,
+        "abs_p99": 1.8945659399032593,
+        "abs_max": 4.595794200897217,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.10420059412717819,
+        "median_channel_abs_max": 0.22019731998443604,
+        "maximum_channel_abs_max": 0.3388980031013489,
+        "max_to_min_nonzero_ratio": 3.2523615238481214
+      }
+    },
+    {
+      "name": "resblocks.11.convs1.2",
+      "group": "stage_3.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 5,
+      "groups": 1,
+      "parameters": 1596,
+      "macs": 38928384,
+      "weight": {
+        "elements": 1584,
+        "mean": 0.00047477998305112123,
+        "std": 0.05909043177962303,
+        "abs_p50": 0.02826366201043129,
+        "abs_p95": 0.11375962197780609,
+        "abs_p99": 0.1954708695411682,
+        "abs_max": 0.574763298034668,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.09867949038743973,
+        "std": 0.3428269028663635,
+        "abs_p50": 0.009601682424545288,
+        "abs_p95": 0.6679660677909851,
+        "abs_p99": 1.7936387062072754,
+        "abs_max": 6.082249164581299,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.062278348952531815,
+        "std": 0.48142024874687195,
+        "abs_p50": 0.04105839133262634,
+        "abs_p95": 1.0911269187927246,
+        "abs_p99": 2.022552967071533,
+        "abs_max": 4.178989410400391,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.09195007383823395,
+        "median_channel_abs_max": 0.14543446898460388,
+        "maximum_channel_abs_max": 0.574763298034668,
+        "max_to_min_nonzero_ratio": 6.2508193201219
+      }
+    },
+    {
+      "name": "resblocks.11.convs2.2",
+      "group": "stage_3.resblock_k11",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        12,
+        24576
+      ],
+      "kernel": 11,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 1596,
+      "macs": 38928384,
+      "weight": {
+        "elements": 1584,
+        "mean": -0.003926149569451809,
+        "std": 0.07997184991836548,
+        "abs_p50": 0.027292143553495407,
+        "abs_p95": 0.17797067761421204,
+        "abs_p99": 0.2989693880081177,
+        "abs_max": 0.44127148389816284,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.07566481083631516,
+        "std": 0.24012893438339233,
+        "abs_p50": 0.014321626164019108,
+        "abs_p95": 0.5909651517868042,
+        "abs_p99": 1.1461654901504517,
+        "abs_max": 2.5981907844543457,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 294912,
+        "mean": -0.10624954849481583,
+        "std": 0.5261244773864746,
+        "abs_p50": 0.05795085057616234,
+        "abs_p95": 1.2251696586608887,
+        "abs_p99": 2.431081533432007,
+        "abs_max": 5.491566181182861,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.03703578561544418,
+        "median_channel_abs_max": 0.23320592939853668,
+        "maximum_channel_abs_max": 0.44127148389816284,
+        "max_to_min_nonzero_ratio": 11.914732644800425
+      }
+    },
+    {
+      "name": "conv_post",
+      "group": "post",
+      "type": "Conv1d",
+      "input_shape": [
+        1,
+        12,
+        24576
+      ],
+      "output_shape": [
+        1,
+        1,
+        24576
+      ],
+      "kernel": 7,
+      "stride": 1,
+      "dilation": 1,
+      "groups": 1,
+      "parameters": 84,
+      "macs": 2064384,
+      "weight": {
+        "elements": 84,
+        "mean": -0.0008963915752246976,
+        "std": 0.052439674735069275,
+        "abs_p50": 0.04188663884997368,
+        "abs_p95": 0.09705109149217606,
+        "abs_p99": 0.10838242620229721,
+        "abs_max": 0.11069950461387634,
+        "zero_fraction": 0.0
+      },
+      "input_activation": {
+        "elements": 294912,
+        "mean": 0.0524943470954895,
+        "std": 0.15291765332221985,
+        "abs_p50": 0.004360606893897057,
+        "abs_p95": 0.28389257192611694,
+        "abs_p99": 0.8403037786483765,
+        "abs_max": 2.3254096508026123,
+        "zero_fraction": 0.0
+      },
+      "output_activation": {
+        "elements": 24576,
+        "mean": 1.8763161278911866e-05,
+        "std": 0.059166111052036285,
+        "abs_p50": 0.017786037176847458,
+        "abs_p95": 0.12637460231781006,
+        "abs_p99": 0.21062195301055908,
+        "abs_max": 0.5682240724563599,
+        "zero_fraction": 0.0
+      },
+      "output_channel_range": {
+        "minimum_channel_abs_max": 0.11069950461387634,
+        "median_channel_abs_max": 0.11069950461387634,
+        "maximum_channel_abs_max": 0.11069950461387634,
+        "max_to_min_nonzero_ratio": 1.0
+      }
+    }
+  ]
+}
